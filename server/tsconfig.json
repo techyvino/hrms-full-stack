@@ -1,16 +1,23 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
+    "module": "ESNext",
+    "allowJs": true,
     "strict": true,
     "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "types": ["node"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "baseUrl": "./",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+      "@/*": ["./*"]
+    },
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "pretty": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

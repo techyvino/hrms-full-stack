@@ -122,6 +122,7 @@ export default [
     rules: {
       'unicorn/better-regex': 'warn',
       'unicorn/no-null': 'off',
+      'unicorn/prevent-abbreviations': 'warn',
       'unicorn/filename-case': [
         'error',
         {
@@ -130,7 +131,7 @@ export default [
         },
       ],
     },
-  }, // filename-case configuration
+  }, // unicorn configuration
   {
     plugins: {
       sonarjs: sonarPlugin,

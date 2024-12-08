@@ -31,7 +31,7 @@ const EnvironmentSchema = z.object({
 export type env = z.infer<typeof EnvironmentSchema>
 
 // eslint-disable-next-line n/no-process-env
-const { data: env, error } = EnvironmentSchema.safeParse(process.env)
+const { data: envVariables, error } = EnvironmentSchema.safeParse(process.env)
 
 if (error) {
   console.error('❌ Invalid env:')
@@ -39,4 +39,4 @@ if (error) {
   // eslint-disable-next-line unicorn/no-process-exit
   process.exit(1)
 }
-export default env!
+export default envVariables!

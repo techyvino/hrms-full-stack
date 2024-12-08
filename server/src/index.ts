@@ -1,7 +1,10 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import { notFound } from 'stoker/middlewares'
 
 const app = new Hono()
+
+app.notFound(notFound) // custom 404 response
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')
