@@ -1,0 +1,43 @@
+{
+  "cSpell.words": [
+    "Aadhaar",
+    "Archu",
+    "arvi",
+    "arvihrms",
+    "capgo",
+    "clsx",
+    "cmdk",
+    "Geocode",
+    "geolocation",
+    "hono",
+    "hookform",
+    "hrms",
+    "Kolkata",
+    "nativegeocoder",
+    "neondatabase",
+    "nextui",
+    "signup",
+    "sonner",
+    "tseslint",
+    "turbopack",
+    "unoptimized",
+    "vercel"
+  ],
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "workbench.editor.enablePreviewFromQuickOpen": true,
+  "workbench.editor.enablePreviewFromCodeNavigation": true,
+  "editor.suggest.preview": true,
+
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.enable": true,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.format.enable": true,
+  "eslint.nodePath": "./node_modules/eslint",
+  "editor.quickSuggestions": {
+    "strings": "on"
+  }
+}
