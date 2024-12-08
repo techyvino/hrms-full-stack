@@ -1,33 +1,37 @@
-import { zValidator } from "@hono/zod-validator"
-import type { NeonDbError } from "@neondatabase/serverless"
-import { eq } from "drizzle-orm"
-import { Hono } from "hono"
-import { z } from "zod"
+import { zValidator } from '@hono/zod-validator'
+import type { NeonDbError } from '@neondatabase/serverless'
+import { eq } from 'drizzle-orm'
+import { Hono } from 'hono'
+import { z } from 'zod'
 
-import { db } from "@/db"
-import { roleTypeTable, sitesTable, usersTable } from "@/db/schemas"
-import { generateHashedPassword } from "@/lib/auth"
-import { formateDbError } from "@/lib/error-handling"
-import { formatZodErrors } from "@/lib/utils"
-import { signUpValuesSchema } from "@/zod/schemas/user"
+import { db } from '@/db'
+import { roleTypeTable, sitesTable, usersTable } from '@/db/schemas'
+import { generateHashedPassword } from '@/lib/auth'
+import { dbError } from '@/lib/error-handling'
+import { formatZodErrors } from '@/lib/utils'
+import { signUpValuesSchema } from '@/zod/schemas/user'
 
 const userRouter = new Hono()
 
 // register new user
 userRouter.post(
-  "/register",
-  zValidator("json", signUpValuesSchema, (result, c) => {
+  '/register',
+  zValidator('json', signUpValuesSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
     }
   }),
   async (c) => {
-    const { password, ...rest }: z.infer<typeof signUpValuesSchema> = await c.req.valid("json")
+    const { password, ...rest }: z.infer<typeof signUpValuesSchema> =
+      await c.req.valid('json')
 
-    const isUserExist = await db.select().from(usersTable).where(eq(usersTable.mobile_no, rest.mobile_no))
+    const isUserExist = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.mobile_no, rest.mobile_no))
 
     if (isUserExist.length > 0) {
-      return c.json({ message: "User already exist" }, 409)
+      return c.json({ message: 'User already exist' }, 409)
     }
 
     const hashedPassword = await generateHashedPassword(password)
@@ -40,18 +44,18 @@ userRouter.post(
 
       return c.json(
         {
-          message: "User Created Successfully",
+          message: 'User Created Successfully',
         },
-        201,
+        201
       )
     } catch (error) {
-      return c.json({ error: formateDbError(error as NeonDbError) }, 500)
+      return c.json({ error: dbError(error as NeonDbError) }, 500)
     }
-  },
+  }
 )
 
 // user profile update
-userRouter.post("/profile-update", async (c) => {
+userRouter.post('/profile-update', async (c) => {
   const body: z.infer<typeof signUpValuesSchema> = await c.req.json()
 
   try {
@@ -61,21 +65,23 @@ userRouter.post("/profile-update", async (c) => {
       .where(eq(usersTable.mobile_no, body.mobile_no))
       .returning()
     if (result?.length === 0) {
-      return c.json({ message: "User not found" }, 400)
+      return c.json({ message: 'User not found' }, 400)
     }
     return c.json({
-      message: "Profile Updated successfully",
+      message: 'Profile Updated successfully',
     })
   } catch (error) {
-    if (error) return c.json({ error }, 400)
+    if (error) {
+      return c.json({ error }, 400)
+    }
   }
 })
 
 // get user info by id
 userRouter.get(
-  "/getUserDetail/:id",
+  '/getUserDetail/:id',
   zValidator(
-    "param",
+    'param',
     z.object({
       id: z.string(),
     }),
@@ -83,12 +89,14 @@ userRouter.get(
       if (!result.success) {
         return c.json(formatZodErrors(result?.error), 400)
       }
-    },
+    }
   ),
   async (c) => {
-    const userId = Number((await c.req.param("id")) || 0)
-    console.log("userId:", userId)
-    if (!userId) return c.json({ message: "Invalid user id" })
+    const userId = Number(c.req.param('id') || 0)
+
+    if (!userId) {
+      return c.json({ message: 'Invalid user id' })
+    }
 
     try {
       const result = await db
@@ -98,7 +106,9 @@ userRouter.get(
         .leftJoin(sitesTable, eq(usersTable.site_id, sitesTable.id))
         .leftJoin(roleTypeTable, eq(usersTable.role_id, roleTypeTable.id))
 
-      if (result.length === 0) return c.json({ message: "User details not found" }, 403)
+      if (result.length === 0) {
+        return c.json({ message: 'User details not found' }, 403)
+      }
 
       const [{ users, sites, role_type }] = result
 
@@ -142,9 +152,9 @@ userRouter.get(
 
       return c.json({ data: response })
     } catch (error) {
-      return c.json({ error: formateDbError(error as NeonDbError) }, 500)
+      return c.json({ error: dbError(error as NeonDbError) }, 500)
     }
-  },
+  }
 )
 
 export default userRouter
