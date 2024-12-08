@@ -2,6 +2,16 @@
 # deps
 node_modules/
 
+# next.js
+/.next/
+/out/
+.vercel
+certificates
+
+# production
+/out
+
+
 # env
 .env
 .env.production
@@ -17,3 +27,8 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+# capacitor
+android
+ios
+client/next-env.d.ts
