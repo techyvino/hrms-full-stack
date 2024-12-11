@@ -2,7 +2,8 @@ import { eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 
 import { db } from '@/db'
-import { activityLogTable, usersTable } from '@/db/schemas'
+import { activityLogTable } from '@/db/schemas/activity.schema'
+import { usersTable } from '@/db/schemas/user.schema'
 
 const activityRouter = new Hono()
 activityRouter.post('/clock-in', async (c) => {

@@ -1,5 +1,13 @@
 {
-  "cSpell.words": ["neondatabase", "nodenext", "sonarjs"],
+  "cSpell.words": [
+    "dlgb",
+    "HRMR",
+    "HRMS",
+    "neondatabase",
+    "nodenext",
+    "sonarjs",
+    "sslmode"
+  ],
   "eslint.enable": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {

@@ -1,28 +1,34 @@
-import { zValidator } from '@hono/zod-validator'
 import type { NeonDbError } from '@neondatabase/serverless'
 import { eq, or } from 'drizzle-orm'
-import { Hono } from 'hono'
+import { describeRoute } from 'hono-openapi'
+import { validator as zValidator } from 'hono-openapi/zod'
 import type { z } from 'zod'
 
 import { db } from '@/db'
-import { loginLogs, usersTable } from '@/db/schemas'
+import { loginLogs } from '@/db/schemas/login.schema'
+import { usersTable } from '@/db/schemas/user.schema'
 import type { JWTPayloadWithUser } from '@/lib/auth'
 import {
   generateHashedPassword,
   generateToken,
   verifyPassword,
 } from '@/lib/auth'
+import { createRouter } from '@/lib/create-app'
 import { dbError } from '@/lib/error-handling'
 import { formatZodErrors, getRandomString } from '@/lib/utils'
+import { loginSchema } from '@/routes/auth/zod'
 import { envVariables } from '@/zod/env'
-import { loginSchema } from '@/zod/schemas/auth'
 import { forgotPasswordSchema, updatePasswordSchema } from '@/zod/schemas/user'
 
-const authRouter = new Hono()
+const authRouter = createRouter()
 
 // login
 authRouter.post(
   '/login',
+  describeRoute({
+    summary: 'Login',
+    description: 'Login to the system',
+  }),
   zValidator('json', loginSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
@@ -145,6 +151,10 @@ authRouter.post(
 //change password
 authRouter.post(
   '/change-password',
+  describeRoute({
+    summary: 'Change Password',
+    description: 'Change password with old password',
+  }),
   zValidator('json', updatePasswordSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
@@ -187,6 +197,11 @@ authRouter.post(
 // reset password
 authRouter.post(
   '/reset-password',
+  describeRoute({
+    summary: 'Reset Password',
+    description: 'Reset password with verification code',
+    hide: true,
+  }),
   zValidator('json', forgotPasswordSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
@@ -230,50 +245,54 @@ authRouter.post(
 )
 
 // logout
-authRouter.post('/logout', async (c) => {
-  const { email, id } = (await c.var.jwtPayload) as JWTPayloadWithUser
+authRouter.post(
+  '/logout',
+  describeRoute({ summary: 'Logout', description: 'Logout current session' }),
+  async (c) => {
+    const { email, id } = (await c.var.jwtPayload) as JWTPayloadWithUser
 
-  try {
-    const [user] = await db
-      .select()
-      .from(usersTable)
-      .where(or(eq(usersTable.email, email), eq(usersTable.id, id)))
-      .limit(1)
+    try {
+      const [user] = await db
+        .select()
+        .from(usersTable)
+        .where(or(eq(usersTable.email, email), eq(usersTable.id, id)))
+        .limit(1)
 
-    if (!user) {
+      if (!user) {
+        return c.json(
+          {
+            message: 'Invalid username',
+          },
+          404
+        )
+      }
+
+      await db
+        .update(loginLogs)
+        .set({
+          logout_time: new Date(),
+        })
+        .where(eq(loginLogs.user_id, user.id))
+        .returning()
+
+      await db
+        .update(usersTable)
+        .set({
+          access_token: null,
+        })
+        .where(eq(usersTable.id, user.id))
+        .returning()
+
       return c.json(
         {
-          message: 'Invalid username',
+          message: 'Logged out successfully',
         },
-        404
+        200
       )
+    } catch (error) {
+      return c.json({ error: dbError(error as NeonDbError) }, 500)
     }
-
-    await db
-      .update(loginLogs)
-      .set({
-        logout_time: new Date(),
-      })
-      .where(eq(loginLogs.user_id, user.id))
-      .returning()
-
-    await db
-      .update(usersTable)
-      .set({
-        access_token: null,
-      })
-      .where(eq(usersTable.id, user.id))
-      .returning()
-
-    return c.json(
-      {
-        message: 'Logged out successfully',
-      },
-      200
-    )
-  } catch (error) {
-    return c.json({ error: dbError(error as NeonDbError) }, 500)
   }
-})
+)
 
 export default authRouter

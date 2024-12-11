@@ -2,7 +2,8 @@ import { eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 
 import { db } from '@/db'
-import { roleTypeTable, sitesTable } from '@/db/schemas'
+import { roleTypeTable } from '@/db/schemas/role.schema'
+import { sitesTable } from '@/db/schemas/sites.schema'
 
 const lookupRouter = new Hono()
 

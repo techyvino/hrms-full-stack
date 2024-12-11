@@ -2,7 +2,7 @@ import { eq, getTableColumns } from 'drizzle-orm'
 import type { Context } from 'hono'
 
 import { db } from '@/db'
-import { usersTable } from '@/db/schemas'
+import { usersTable } from '@/db/schemas/user.schema'
 import { verifyToken } from '@/lib/auth'
 
 export const authMiddleware = async (c: Context, next: () => Promise<void>) => {

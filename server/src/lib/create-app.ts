@@ -7,9 +7,16 @@ import { openAPISpecs } from 'hono-openapi'
 
 import notFound from '@/lib/not-found'
 import serveEmojiFavicon from '@/lib/serve-emoji-favicon'
+import type { AppBindings } from '@/lib/types'
 import { pinoLogger } from '@/middleware/logger'
+export const createRouter = () => {
+  return new Hono<AppBindings>({
+    strict: false,
+  })
+}
+
 export default function createApp() {
-  const app = new Hono()
+  const app = createRouter()
   app.use(serveEmojiFavicon('🔥'))
   app.use(pinoLogger())
   app.use(prettyJSON())
@@ -22,10 +29,24 @@ export default function createApp() {
     openAPISpecs(app, {
       documentation: {
         info: {
-          title: 'Hono',
+          title: 'HRMS - API Documentation',
           version: '1.0.0',
-          description: 'API for greeting users',
+          description: 'API Documentation for each endpoint',
         },
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: 'http',
+              scheme: 'bearer',
+              bearerFormat: 'JWT',
+            },
+          },
+        },
+        security: [
+          {
+            bearerAuth: [],
+          },
+        ],
       },
     })
   )
