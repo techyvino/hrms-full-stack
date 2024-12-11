@@ -1,45 +1,52 @@
-import { zValidator } from "@hono/zod-validator"
-import type { NeonDbError } from "@neondatabase/serverless"
-import { eq, or } from "drizzle-orm"
-import { Hono } from "hono"
-import type { z } from "zod"
+import { zValidator } from '@hono/zod-validator'
+import type { NeonDbError } from '@neondatabase/serverless'
+import { eq, or } from 'drizzle-orm'
+import { Hono } from 'hono'
+import type { z } from 'zod'
 
-import { db } from "@/db"
-import { loginLogs, usersTable } from "@/db/schemas"
-import type { JWTPayloadWithUser } from "@/lib/auth"
-import { generateHashedPassword, generateToken, verifyPassword } from "@/lib/auth"
-import { formateDbError } from "@/lib/error-handling"
-import { formatZodErrors, getRandomString } from "@/lib/utils"
-import { envVariables } from "@/zod/env"
-import { loginSchema } from "@/zod/schemas/auth"
-import { forgotPasswordSchema, updatePasswordSchema } from "@/zod/schemas/user"
+import { db } from '@/db'
+import { loginLogs, usersTable } from '@/db/schemas'
+import type { JWTPayloadWithUser } from '@/lib/auth'
+import {
+  generateHashedPassword,
+  generateToken,
+  verifyPassword,
+} from '@/lib/auth'
+import { dbError } from '@/lib/error-handling'
+import { formatZodErrors, getRandomString } from '@/lib/utils'
+import { envVariables } from '@/zod/env'
+import { loginSchema } from '@/zod/schemas/auth'
+import { forgotPasswordSchema, updatePasswordSchema } from '@/zod/schemas/user'
 
 const authRouter = new Hono()
 
 // login
 authRouter.post(
-  "/login",
-  zValidator("json", loginSchema, (result, c) => {
+  '/login',
+  zValidator('json', loginSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
     }
   }),
   async (c) => {
-    const { username, password, ...rest }: z.infer<typeof loginSchema> = await c.req.json()
+    const { username, password, ...rest }: z.infer<typeof loginSchema> =
+      await c.req.json()
 
     try {
       const [user] = await db
         .select()
         .from(usersTable)
-        .where(or(eq(usersTable.email, username), eq(usersTable.mobile_no, username)))
+        .where(
+          or(eq(usersTable.email, username), eq(usersTable.mobile_no, username))
+        )
         .limit(1)
 
       if (!user) {
         return c.json(
           {
-            message: "Invalid username",
+            message: 'Invalid username',
           },
-          404,
+          404
         )
       }
 
@@ -55,20 +62,24 @@ authRouter.post(
             })
             .where(eq(usersTable.id, user.id))
             .execute()
-          if (Number(envVariables.MAXIMUM_LOGIN_ATTEMPTS) <= user.login_attempts) {
+          if (
+            Number(envVariables.MAXIMUM_LOGIN_ATTEMPTS) <= user.login_attempts
+          ) {
             return c.json(
               {
-                message: `Account locked due to too many failed login attempts.`,
+                message:
+                  'Account locked due to too many failed login attempts.',
               },
-              429,
+              429
             )
           }
         }
 
         const errorMessage = {
-          message: "Invalid password",
+          message: 'Invalid password',
           ...(Number(envVariables.MAXIMUM_LOGIN_ATTEMPTS || 0) && {
-            remaining_login_attempts: Number(envVariables.MAXIMUM_LOGIN_ATTEMPTS) - user.login_attempts,
+            remaining_login_attempts:
+              Number(envVariables.MAXIMUM_LOGIN_ATTEMPTS) - user.login_attempts,
           }),
         }
         return c.json(errorMessage, 403)
@@ -103,7 +114,7 @@ authRouter.post(
       await db
         .update(usersTable)
         .set({
-          status: "active",
+          status: 'active',
           login_attempts: 0,
           access_token,
           session_id: jwtPayload?.session_id,
@@ -114,7 +125,7 @@ authRouter.post(
 
       return c.json(
         {
-          message: "Login success",
+          message: 'Login success',
           data: {
             access_token,
             name: user.name,
@@ -123,18 +134,18 @@ authRouter.post(
             role_id: user.role_id,
           },
         },
-        200,
+        200
       )
     } catch (error) {
-      return c.json({ error: formateDbError(error as NeonDbError) })
+      return c.json({ error: dbError(error as NeonDbError) })
     }
-  },
+  }
 )
 
 //change password
 authRouter.post(
-  "/change-password",
-  zValidator("json", updatePasswordSchema, (result, c) => {
+  '/change-password',
+  zValidator('json', updatePasswordSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
     }
@@ -142,11 +153,22 @@ authRouter.post(
   async (c) => {
     const body: z.infer<typeof updatePasswordSchema> = await c.req.json()
 
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, body.user_id)).limit(1)
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, body.user_id))
+      .limit(1)
 
-    if (!user) return c.json({ message: "User not found" }, 401)
-    const passwordMatch = await verifyPassword(body?.old_password, user?.password)
-    if (!passwordMatch) return c.json({ message: "Incorrect old password" }, 400)
+    if (!user) {
+      return c.json({ message: 'User not found' }, 401)
+    }
+    const passwordMatch = await verifyPassword(
+      body?.old_password,
+      user?.password
+    )
+    if (!passwordMatch) {
+      return c.json({ message: 'Incorrect old password' }, 400)
+    }
 
     const hashedPassword = await generateHashedPassword(body?.new_password)
 
@@ -158,30 +180,40 @@ authRouter.post(
       .where(eq(usersTable.id, body.user_id)) // except mobile_no and email (i-e non unique values)
       .returning()
 
-    return c.json({ message: "Password updated successfully" })
-  },
+    return c.json({ message: 'Password updated successfully' })
+  }
 )
 
 // reset password
 authRouter.post(
-  "/reset-password",
-  zValidator("json", forgotPasswordSchema, (result, c) => {
+  '/reset-password',
+  zValidator('json', forgotPasswordSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
     }
   }),
   async (c) => {
-    const { username, new_password, verification_code }: z.infer<typeof forgotPasswordSchema> = await c.req.json()
+    const {
+      username,
+      new_password,
+      verification_code,
+    }: z.infer<typeof forgotPasswordSchema> = await c.req.json()
 
     const [user] = await db
       .select()
       .from(usersTable)
-      .where(or(eq(usersTable.email, username), eq(usersTable.mobile_no, username)))
+      .where(
+        or(eq(usersTable.email, username), eq(usersTable.mobile_no, username))
+      )
       .limit(1)
 
-    if (!user) return c.json({ message: "User not found" }, 401)
+    if (!user) {
+      return c.json({ message: 'User not found' }, 401)
+    }
 
-    if (user.verification_code !== verification_code) return c.json({ message: "Invalid Verification code" }, 401) // need to handle
+    if (user.verification_code !== verification_code) {
+      return c.json({ message: 'Invalid Verification code' }, 401)
+    } // need to handle
 
     const hashedPassword = await generateHashedPassword(new_password)
 
@@ -193,12 +225,12 @@ authRouter.post(
       .where(eq(usersTable.id, user.id)) // except mobile_no and email (i-e non unique values)
       .returning()
 
-    return c.json({ message: "Password reset successfully" })
-  },
+    return c.json({ message: 'Password reset successfully' })
+  }
 )
 
 // logout
-authRouter.post("/logout", async (c) => {
+authRouter.post('/logout', async (c) => {
   const { email, id } = (await c.var.jwtPayload) as JWTPayloadWithUser
 
   try {
@@ -211,9 +243,9 @@ authRouter.post("/logout", async (c) => {
     if (!user) {
       return c.json(
         {
-          message: "Invalid username",
+          message: 'Invalid username',
         },
-        404,
+        404
       )
     }
 
@@ -235,12 +267,12 @@ authRouter.post("/logout", async (c) => {
 
     return c.json(
       {
-        message: "Logged out successfully",
+        message: 'Logged out successfully',
       },
-      200,
+      200
     )
   } catch (error) {
-    return c.json({ error: formateDbError(error as NeonDbError) }, 500)
+    return c.json({ error: dbError(error as NeonDbError) }, 500)
   }
 })
 

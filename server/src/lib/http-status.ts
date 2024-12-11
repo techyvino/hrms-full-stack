@@ -18,15 +18,8 @@ enum HttpStatusCode {
   SERVICE_UNAVAILABLE = 503,
 }
 
-// Detailed Status Response Interface
-interface StatusResponse {
-  statusCode: HttpStatusCode
-  message: string
-  success: boolean
-}
-
 // Human-Readable Status Mapping (Static Map)
-const statusMap: Record<string, StatusResponse> = {
+const statusMap = {
   // Success Responses
   success: {
     statusCode: HttpStatusCode.OK,
@@ -125,6 +118,7 @@ function getDefaultMessageForCode(code: HttpStatusCode): string {
 }
 
 // Custom Response Generator Function
+
 function respondHandler(
   c: Context,
   type: keyof typeof statusMap,

@@ -1,16 +1,10 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 
-import path from 'node:path'
-
 import { config } from 'dotenv'
 import { expand } from 'dotenv-expand'
 import { z } from 'zod'
 
-expand(
-  config({
-    path: path.resolve(process.cwd()),
-  })
-)
+expand(config())
 
 const EnvironmentSchema = z.object({
   NODE_ENV: z
