@@ -28,6 +28,49 @@ authRouter.post(
   describeRoute({
     summary: 'Login',
     description: 'Login to the system',
+    responses: {
+      200: {
+        description: 'User logged in successfully',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                access_token: {
+                  type: 'string',
+                },
+                user: {
+                  type: 'object',
+                  properties: {
+                    name: {
+                      type: 'string',
+                    },
+                    email: {
+                      type: 'string',
+                    },
+                    user_id: {
+                      type: 'number',
+                    },
+                    role_id: {
+                      type: 'number',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      403: {
+        description: 'Invalid Password',
+      },
+      404: {
+        description: 'Invalid Username',
+      },
+      423: {
+        description: 'Account Locked',
+      },
+    },
   }),
   zValidator('json', loginSchema, (result, c) => {
     if (!result.success) {
