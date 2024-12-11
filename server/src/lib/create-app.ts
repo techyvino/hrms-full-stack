@@ -1,18 +1,20 @@
-import notFound from '@/lib/not-found'
-import serveEmojiFavicon from '@/lib/serve-emoji-favicon'
-import { pinoLogger } from '@/middleware/logger'
 import { swaggerUI } from '@hono/swagger-ui'
 import { apiReference } from '@scalar/hono-api-reference'
 import { Hono } from 'hono'
-import { openAPISpecs } from 'hono-openapi'
+import { cors } from 'hono/cors'
 import { prettyJSON } from 'hono/pretty-json'
+import { openAPISpecs } from 'hono-openapi'
 
+import notFound from '@/lib/not-found'
+import serveEmojiFavicon from '@/lib/serve-emoji-favicon'
+import { pinoLogger } from '@/middleware/logger'
 export default function createApp() {
   const app = new Hono()
   app.use(serveEmojiFavicon('🔥'))
   app.use(pinoLogger())
   app.use(prettyJSON())
   app.notFound(notFound)
+  app.use(cors())
 
   // Documentation: https://hono.dev/examples/hono-openapi
   app.get(
