@@ -170,4 +170,10 @@ function errorMiddleware(error: Error, c: Context) {
 }
 
 // Export functions for use in other modules
-export { customStatus, errorMiddleware, HttpStatusCode, respondHandler }
+export {
+  customStatus,
+  errorMiddleware,
+  getDefaultMessageForCode,
+  HttpStatusCode,
+  respondHandler,
+}

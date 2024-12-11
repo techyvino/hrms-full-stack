@@ -13,14 +13,13 @@
     "bcrypt-ts": "^5.0.3",
     "dotenv": "^16.4.7",
     "dotenv-expand": "^12.0.1",
-    "drizzle-orm": "^0.37.0",
+    "drizzle-orm": "^0.38.0",
     "hono": "^4.6.13",
     "hono-openapi": "^0.2.1",
     "hono-pino": "^0.7.0",
     "i": "^0.3.7",
     "npm": "^10.9.2",
-    "stoker": "^1.4.2",
-    "zod": "^3.23.8",
+    "zod": "^3.24.1",
     "zod-openapi": "^4.1.0"
   },
   "devDependencies": {
@@ -28,11 +27,11 @@
     "@hono/eslint-config": "^1.0.2",
     "@types/bun": "^1.1.14",
     "@types/node": "^22.10.1",
-    "@typescript-eslint/parser": "^8.17.0",
-    "drizzle-kit": "^0.29.1",
+    "@typescript-eslint/parser": "^8.18.0",
+    "drizzle-kit": "^0.30.0",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-n": "^17.14.0",
+    "eslint-plugin-n": "^17.15.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
@@ -42,7 +41,7 @@
     "globals": "^15.13.0",
     "prettier": "^3.4.2",
     "tsx": "^4.19.2",
-    "typescript-eslint": "^8.17.0"
+    "typescript-eslint": "^8.18.0"
   },
   "peerDependencies": {
     "typescript": "^5.7.2"
