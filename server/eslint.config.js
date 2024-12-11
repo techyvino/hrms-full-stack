@@ -1,6 +1,5 @@
 import pluginJs from '@eslint/js'
 import baseConfig from '@hono/eslint-config'
-import tsParser from '@typescript-eslint/parser'
 import nodePlugin from 'eslint-plugin-n'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import promisePlugin from 'eslint-plugin-promise'
@@ -17,7 +16,6 @@ export default [
   { files: ['**/*.{js,mjs,cjs,ts}'] },
   {
     languageOptions: {
-      parser: tsParser,
       globals: globals.node,
       ecmaVersion: 'latest',
       parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
@@ -25,8 +23,8 @@ export default [
   },
   pluginJs.configs.recommended,
   eslintPluginUnicorn.configs['flat/recommended'],
-  ...tsEslint.configs.recommended,
   ...baseConfig,
+  ...tsEslint.configs.recommended,
   {
     rules: {
       'no-unused-vars': 'off',

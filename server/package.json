@@ -2,9 +2,14 @@
   "name": "hono-server",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "bun run --hot src/index.ts",
+    "build": "bun build src/index.ts --outdir=dist",
+    "start": "bun run dist/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
+  },
+  "engines": {
+    "node": "22.x"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",
