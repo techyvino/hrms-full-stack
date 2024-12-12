@@ -15,8 +15,7 @@ export interface UseFetchResult<T> {
   error: AxiosError | null
   isLoading: boolean
   isError: boolean
-  fetcher: (reqOption: AxiosRequestConfig) => Promise<void>
-  refetch: () => Promise<void>
+  fetcher: (reqOption: AxiosRequestConfig | string) => Promise<void>
 }
 
 export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetchResult<T> {
@@ -28,16 +27,10 @@ export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetc
   const [error, setError] = useState<AxiosError | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  // Keep track of component mount status
-  const mounted = useRef(true)
-
   // For managing the request (cancel logic)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const fetchData = useCallback(async () => {
-    // Don't proceed if the component is unmounted
-    if (!mounted.current) return
-
     setIsLoading(true)
     setError(null)
 
@@ -53,29 +46,23 @@ export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetc
       })
 
       // Only update state if the component is still mounted
-      if (mounted.current) {
-        const responseData = response.data
-        setData(responseData)
-        onSuccess?.(responseData)
-      }
+      const responseData = response.data
+      setData(responseData)
+      onSuccess?.(responseData)
     } catch (err) {
       if (err instanceof AxiosError && axios.isCancel(err)) {
         // Ignore request cancellation
         return
       }
 
-      if (mounted.current) {
-        setError(err as AxiosError)
-        onError?.(err as AxiosError)
-      }
+      setError(err as AxiosError)
+      onError?.(err as AxiosError)
     } finally {
-      if (mounted.current) {
-        setIsLoading(false)
-      }
+      setIsLoading(false)
     }
   }, [axiosConfig, onSuccess, onError])
 
-  const fetcher = useCallback(async (reqConfig: AxiosRequestConfig) => {
+  const fetcher = useCallback(async (reqConfig: AxiosRequestConfig | string) => {
     if (typeof reqConfig === 'string') {
       await setAxiosConfig({ url: reqConfig, method: 'GET' })
     } else if (reqConfig?.url) await setAxiosConfig(reqConfig)
@@ -90,8 +77,6 @@ export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetc
   // Cleanup effect
   useEffect(() => {
     return () => {
-      mounted.current = false
-
       // Cancel any ongoing request on cleanup
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
@@ -105,6 +90,5 @@ export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetc
     isLoading,
     fetcher,
     isError: error !== null,
-    refetch: fetchData,
   }
 }

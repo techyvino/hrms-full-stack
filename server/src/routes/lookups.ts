@@ -51,8 +51,4 @@ lookupRouter.post('/add-site', async (c) => {
   )
 })
 
-lookupRouter.get('/', async (request) => {
-  return request.json({ message: 'Hello lookup!' })
-})
-
 export default lookupRouter

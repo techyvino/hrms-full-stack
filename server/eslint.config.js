@@ -120,7 +120,7 @@ export default [
     rules: {
       'unicorn/better-regex': 'warn',
       'unicorn/no-null': 'off',
-      'unicorn/prevent-abbreviations': 'warn',
+      'unicorn/prevent-abbreviations': 'off',
       'unicorn/filename-case': [
         'error',
         {

@@ -1,13 +1,12 @@
 import type { NeonDbError } from '@neondatabase/serverless'
 import { eq, or } from 'drizzle-orm'
 import { describeRoute } from 'hono-openapi'
-import { validator as zValidator } from 'hono-openapi/zod'
+import { resolver, validator as zValidator } from 'hono-openapi/zod'
 import type { z } from 'zod'
 
 import { db } from '@/db'
 import { loginLogs } from '@/db/schemas/login.schema'
 import { usersTable } from '@/db/schemas/user.schema'
-import type { JWTPayloadWithUser } from '@/lib/auth'
 import {
   generateHashedPassword,
   generateToken,
@@ -15,12 +14,19 @@ import {
 } from '@/lib/auth'
 import { createRouter } from '@/lib/create-app'
 import { dbError } from '@/lib/error-handling'
+import { respondHandler } from '@/lib/http-status'
 import { formatZodErrors, getRandomString } from '@/lib/utils'
-import { loginSchema } from '@/routes/auth/zod'
+import {
+  changePasswordSchema,
+  forgotPasswordSchema,
+  loginRequestSchema,
+  loginResponseSuccessSchema,
+  responseSchema,
+} from '@/routes/auth/zod'
 import { envVariables } from '@/zod/env'
-import { forgotPasswordSchema, updatePasswordSchema } from '@/zod/schemas/user'
 
 const authRouter = createRouter()
+const tags = ['Authentication']
 
 // login
 authRouter.post(
@@ -28,57 +34,25 @@ authRouter.post(
   describeRoute({
     summary: 'Login',
     description: 'Login to the system',
+    tags,
     responses: {
       200: {
         description: 'User logged in successfully',
         content: {
           'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                access_token: {
-                  type: 'string',
-                },
-                user: {
-                  type: 'object',
-                  properties: {
-                    name: {
-                      type: 'string',
-                    },
-                    email: {
-                      type: 'string',
-                    },
-                    user_id: {
-                      type: 'number',
-                    },
-                    role_id: {
-                      type: 'number',
-                    },
-                  },
-                },
-              },
-            },
+            schema: resolver(loginResponseSuccessSchema),
           },
         },
       },
-      403: {
-        description: 'Invalid Password',
-      },
-      404: {
-        description: 'Invalid Username',
-      },
-      423: {
-        description: 'Account Locked',
-      },
     },
   }),
-  zValidator('json', loginSchema, (result, c) => {
+  zValidator('json', loginRequestSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
     }
   }),
   async (c) => {
-    const { username, password, ...rest }: z.infer<typeof loginSchema> =
+    const { username, password, ...rest }: z.infer<typeof loginRequestSchema> =
       await c.req.json()
 
     try {
@@ -91,12 +65,7 @@ authRouter.post(
         .limit(1)
 
       if (!user) {
-        return c.json(
-          {
-            message: 'Invalid username',
-          },
-          404
-        )
+        return respondHandler(c, 'not_found', 'Invalid username')
       }
 
       const passwordMatch = await verifyPassword(password, user?.password)
@@ -114,24 +83,21 @@ authRouter.post(
           if (
             Number(envVariables.MAXIMUM_LOGIN_ATTEMPTS) <= user.login_attempts
           ) {
-            return c.json(
-              {
-                message:
-                  'Account locked due to too many failed login attempts.',
-              },
-              429
+            return respondHandler(
+              c,
+              'forbidden',
+              'Account locked due to too many failed login attempts'
             )
           }
         }
 
         const errorMessage = {
-          message: 'Invalid password',
           ...(Number(envVariables.MAXIMUM_LOGIN_ATTEMPTS || 0) && {
             remaining_login_attempts:
               Number(envVariables.MAXIMUM_LOGIN_ATTEMPTS) - user.login_attempts,
           }),
         }
-        return c.json(errorMessage, 403)
+        return respondHandler(c, 'forbidden', errorMessage)
       }
 
       // Check if the user is already logged in
@@ -145,6 +111,7 @@ authRouter.post(
         id: user.id,
         name: user.name,
         email: user.email,
+        role_id: user.role_id,
         session_id: getRandomString(),
       }
 
@@ -172,19 +139,17 @@ authRouter.post(
         .where(eq(usersTable.id, user.id))
         .returning()
 
-      return c.json(
-        {
-          message: 'Login success',
-          data: {
-            access_token,
-            name: user.name,
-            email: user.email,
-            user_id: user.id,
-            role_id: user.role_id,
-          },
+      const data = {
+        access_token,
+        user: {
+          name: user.name,
+          email: user.email,
+          user_id: user.id,
+          role_id: user.role_id,
         },
-        200
-      )
+      }
+
+      return respondHandler(c, 'success', data)
     } catch (error) {
       return c.json({ error: dbError(error as NeonDbError) })
     }
@@ -197,30 +162,42 @@ authRouter.post(
   describeRoute({
     summary: 'Change Password',
     description: 'Change password with old password',
+    tags,
+    responses: {
+      200: {
+        description: 'Password changed successfully',
+        content: {
+          'application/json': {
+            schema: resolver(responseSchema),
+          },
+        },
+      },
+    },
   }),
-  zValidator('json', updatePasswordSchema, (result, c) => {
+  zValidator('json', changePasswordSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
     }
   }),
   async (c) => {
-    const body: z.infer<typeof updatePasswordSchema> = await c.req.json()
+    const body: z.infer<typeof changePasswordSchema> = await c.req.json()
+    const jwtPayload = c.var.user
 
     const [user] = await db
       .select()
       .from(usersTable)
-      .where(eq(usersTable.id, body.user_id))
+      .where(eq(usersTable.id, jwtPayload.id))
       .limit(1)
 
     if (!user) {
-      return c.json({ message: 'User not found' }, 401)
+      return respondHandler(c, 'unauthorized')
     }
     const passwordMatch = await verifyPassword(
       body?.old_password,
       user?.password
     )
     if (!passwordMatch) {
-      return c.json({ message: 'Incorrect old password' }, 400)
+      return respondHandler(c, 'bad_request', 'Incorrect old password')
     }
 
     const hashedPassword = await generateHashedPassword(body?.new_password)
@@ -230,10 +207,10 @@ authRouter.post(
       .set({
         password: hashedPassword,
       })
-      .where(eq(usersTable.id, body.user_id)) // except mobile_no and email (i-e non unique values)
+      .where(eq(usersTable.id, jwtPayload.id)) // except mobile_no and email (i-e non unique values)
       .returning()
 
-    return c.json({ message: 'Password updated successfully' })
+    return respondHandler(c, 'success', 'Password updated successfully')
   }
 )
 
@@ -243,6 +220,7 @@ authRouter.post(
   describeRoute({
     summary: 'Reset Password',
     description: 'Reset password with verification code',
+    tags,
     hide: true,
   }),
   zValidator('json', forgotPasswordSchema, (result, c) => {
@@ -290,9 +268,23 @@ authRouter.post(
 // logout
 authRouter.post(
   '/logout',
-  describeRoute({ summary: 'Logout', description: 'Logout current session' }),
+  describeRoute({
+    summary: 'Logout',
+    description: 'Logout current session',
+    tags,
+    responses: {
+      200: {
+        description: 'Logout successfully',
+        content: {
+          'application/json': {
+            schema: resolver(responseSchema),
+          },
+        },
+      },
+    },
+  }),
   async (c) => {
-    const { email, id } = (await c.var.jwtPayload) as JWTPayloadWithUser
+    const { email, id } = c.var.user
 
     try {
       const [user] = await db

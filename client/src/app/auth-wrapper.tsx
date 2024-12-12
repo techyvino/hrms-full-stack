@@ -8,7 +8,6 @@ type WrapperComponent = FC<{ children: ReactNode }>
 
 const AuthWrapper: WrapperComponent = ({ children }) => {
   const token = getCookie('access_token')
-  console.log('token:', token)
   const path = usePathname()
 
   useEffect(() => {

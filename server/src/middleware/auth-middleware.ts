@@ -67,7 +67,7 @@ export const authMiddleware = async (c: Context, next: () => Promise<void>) => {
       )
     }
 
-    c.set('jwtPayload', payload) // Store payload in context for later use
+    c.set('user', payload) // Store payload in context for later use
     await next()
   } catch (error) {
     return c.json({ message: 'Unauthorized user', details: error }, 401)

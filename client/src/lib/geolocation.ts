@@ -68,7 +68,7 @@ export const addLocationWatcher = async (
       }
     )
   } else {
-    console.error('This app can only be used in a native environment.')
+    console.info('This app can only be used in a native environment.')
     return ''
   }
 }

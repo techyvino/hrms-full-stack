@@ -1,5 +1,6 @@
 'use client'
 
+import { Capacitor } from '@capacitor/core'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { setCookie } from 'cookies-next/client'
 import { Key, UserRound } from 'lucide-react'
@@ -7,6 +8,8 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import type { LoginResponse } from '@/app/auth/login/schemas'
+import { type LoginSchema, loginSchema } from '@/app/auth/login/schemas'
 import { InputForm } from '@/components/form/InputForm'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,11 +18,10 @@ import { useSubmit } from '@/hooks/useSubmit'
 import { getDeviceInfo } from '@/lib/device'
 import { formateLocationInfo, getAddressFromCoordinates, getCurrentLocation } from '@/lib/geolocation'
 import { authUrl } from '@/lib/urls'
-import type { LoginResponse } from '@/schemas/loginSchema'
-import { type LoginSchema, loginSchema } from '@/schemas/loginSchema'
 
 export default function LoginForm() {
   const { push } = useRouter()
+
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -30,7 +32,6 @@ export default function LoginForm() {
 
   const { isLoading, submit } = useSubmit<LoginResponse>({
     onError: (error) => {
-      console.log('error:', error)
       toast.error(error?.message || 'Login Failed')
     },
     onSuccess(res) {
@@ -46,42 +47,49 @@ export default function LoginForm() {
   })
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const { platform, manufacturer, operating_system, os_version, device_model, device_name } = await getDeviceInfo()
+    // for android and ios
+    if (Capacitor.isNativePlatform()) {
+      const { platform, manufacturer, operating_system, os_version, device_model, device_name } = await getDeviceInfo()
 
-    const position = await getCurrentLocation()
-    const address = await getAddressFromCoordinates(position?.coords?.latitude, position?.coords.longitude)
-    const formattedLocation = formateLocationInfo({
-      position,
-      address,
-    })
+      const position = await getCurrentLocation()
+      const address = await getAddressFromCoordinates(position?.coords?.latitude, position?.coords.longitude)
+      const formattedLocation = formateLocationInfo({
+        position,
+        address,
+      })
 
-    const bodyData: LoginSchema = {
-      username: data?.username,
-      password: data?.password,
-      platform,
-      manufacturer,
-      operating_system,
-      os_version,
-      device_name,
-      device_model,
+      const bodyData: LoginSchema = {
+        username: data?.username,
+        password: data?.password,
+        platform,
+        manufacturer,
+        operating_system,
+        os_version,
+        device_name,
+        device_model,
 
-      latitude: formattedLocation?.latitude,
-      longitude: formattedLocation?.longitude,
-      locality: formattedLocation?.locality,
-      area: formattedLocation?.area,
-      postal_code: formattedLocation?.postal_code,
+        latitude: formattedLocation?.latitude,
+        longitude: formattedLocation?.longitude,
+        locality: formattedLocation?.locality,
+        area: formattedLocation?.area,
+        postal_code: formattedLocation?.postal_code,
+      }
+      return submit({
+        url: authUrl.login,
+        data: bodyData,
+      })
     }
     return submit({
       url: authUrl.login,
-      data: bodyData,
+      data,
     })
   })
 
   return (
     <section className="z-10 h-full">
-      <Card className="flex h-full flex-col border-none bg-transparent px-4 py-48 shadow-none md:items-center">
+      <Card className="mx-4 my-40 flex h-full flex-col border-none bg-transparent shadow-none md:items-center">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold md:text-center">Sign in</CardTitle>
+          <CardTitle className="text-4xl font-bold md:text-center">Sign in</CardTitle>
           <CardDescription className="text-sm text-gray-400">Please fill the credentials</CardDescription>
         </CardHeader>
         <CardContent>
@@ -92,9 +100,6 @@ export default function LoginForm() {
                 icon={<UserRound className="stroke-gray-400" />}
                 iconPosition="left"
                 placeholder="Username"
-                classNames={{
-                  input: 'bg-gray-100 border-0 py-5',
-                }}
               />
               <InputForm
                 name="password"
@@ -102,9 +107,6 @@ export default function LoginForm() {
                 icon={<Key className="stroke-gray-400" />}
                 iconPosition="left"
                 placeholder="Password"
-                classNames={{
-                  input: 'bg-gray-100 border-0 py-5',
-                }}
               />
               <Button isLoading={isLoading} type="submit" className="mt-4 w-full">
                 Login

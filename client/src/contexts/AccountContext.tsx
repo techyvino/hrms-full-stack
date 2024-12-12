@@ -1,18 +1,34 @@
+'use client'
+import { getCookie } from 'cookies-next/client'
+import { jwtDecode } from 'jwt-decode'
 import type { ReactNode } from 'react'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
-export const AccountContext = createContext(null)
+export interface User {
+  name: string
+  email: string
+  user_id: number
+  role_id: number
+}
+
+export const AccountContext = createContext<User>({} as User)
 
 export const AccountContextProvider = ({ children }: { children: ReactNode }) => {
-  const [userInfo, setUserInfo] = useState<null>(null)
+  const [account, setAccount] = useState<User>({} as User)
+  const token = getCookie('access_token')
 
   useEffect(() => {
-    const getDeviceInformation = async () => {
-      setUserInfo(null)
+    if (token) {
+      const { id, email, name, role_id } = jwtDecode(token) as Omit<User, 'user_id'> & { id: number }
+      if (id) {
+        setAccount({ user_id: id, email, name, role_id })
+      }
+
+      // setAccount(JSON.parse(account))
     }
-    getDeviceInformation() // get device information
-  }, [])
-  return <AccountContext.Provider value={null}>{children}</AccountContext.Provider>
+  }, [token])
+
+  return <AccountContext.Provider value={{ ...account }}>{children}</AccountContext.Provider>
 }
 
 export const useAccountContext = () => useContext(AccountContext)

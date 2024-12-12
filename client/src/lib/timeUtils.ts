@@ -23,7 +23,7 @@ export const dateTimeNow = () => {
   // Create a DateTime object in IST
   const istDateTime = DateTime.now().setZone('Asia/Kolkata')
   // Format the DateTime object like '10/14/1983, 9:30:33 AM'.
-  const formattedDateTime = istDateTime.toFormat('yyyy-MM-dd HH:mm:ss')
+  const formattedDateTime = istDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss")
 
   return formattedDateTime
 }

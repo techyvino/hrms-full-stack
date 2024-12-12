@@ -3,10 +3,9 @@ import crypto from 'node:crypto'
 import type { ZodError } from 'zod'
 import { z } from 'zod'
 
-export function formatZodErrors(error: ZodError): { [x: string]: string }[] {
-  return error.errors.map((error_) => ({
-    [error_.path[0]]: `${error_.message.toLowerCase()}`, // Error message
-  }))
+export function formatZodErrors(error: ZodError) {
+  const { fieldErrors, formErrors } = error.flatten()
+  return { ...fieldErrors, ...formErrors }
 }
 
 export const createTrimmedString = () =>

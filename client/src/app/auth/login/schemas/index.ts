@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import type { User } from '@/contexts/AccountContext'
 import { transformTrimmedString } from '@/lib/utils'
 
 export const loginSchema = z.object({
@@ -24,9 +25,6 @@ export interface LoginResponse {
   message: string
   data: {
     access_token: string
-    name: string
-    email: string
-    user_id: number
-    role_id: number
+    user: User
   }
 }

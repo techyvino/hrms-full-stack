@@ -1,17 +1,42 @@
-import { Clock10, LogIn, LogOut } from 'lucide-react'
-import React, { useCallback } from 'react'
+import { formatDistanceToNow } from 'date-fns'
+import { Clock4, Clock10, LogIn, LogOut } from 'lucide-react'
+import React, { useCallback, useEffect } from 'react'
 import type { z } from 'zod'
 
 import type { activityLogCreateSchema } from '@/app/dashboard/schemas'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useFetch } from '@/hooks/useFetch'
+import { useSubmit } from '@/hooks/useSubmit'
 import { getDeviceInfo } from '@/lib/device'
 import type { LocationInfo } from '@/lib/geolocation'
 import { formateLocationInfo, getAddressFromCoordinates, getCurrentLocation } from '@/lib/geolocation'
 import { dateTimeNow } from '@/lib/timeUtils'
-import api from '@/services/api'
+import { activityUrl } from '@/lib/urls'
+import { cn } from '@/lib/utils'
+
+interface ClockedStatus {
+  status: number
+  success: boolean
+  data: {
+    is_clocked_in: boolean
+    clocked_in_at: string | null
+    clocked_out_at: string | null
+  }
+}
 
 const TimeTracking = () => {
+  const { data, isLoading, fetcher } = useFetch<ClockedStatus>()
+
+  const { submit, isLoading: isSubmitting } = useSubmit({
+    onSuccess: (res) => {
+      console.log('res:', res)
+      fetcher(activityUrl?.clockedStatus)
+    },
+  })
+
   const getCurrentAddress = useCallback(async () => {
     const position = await getCurrentLocation()
     const address = await getAddressFromCoordinates(position?.coords?.latitude, position?.coords.longitude)
@@ -54,12 +79,10 @@ const TimeTracking = () => {
       clock_in: dateTimeNow(),
       clock_out: null,
     }
-    try {
-      const res = await api.post('/clock-in', bodyData)
-      console.log('res', res)
-    } catch (error) {
-      console.log('error', error)
-    }
+    submit({
+      url: activityUrl.clockedIn,
+      data: bodyData,
+    })
   }
 
   const handleClockedOut = async () => {
@@ -76,34 +99,58 @@ const TimeTracking = () => {
       ...deviceInfo,
       clock_out: dateTimeNow(),
     }
-    try {
-      const res = await api.post('/clock-out', bodyData)
-      console.log('res', res)
-    } catch (error) {
-      console.log('error', error)
-    }
-    // if (trackId) {
-    //   removeLocationWatcher(trackId)
-    // }
+    submit({
+      url: activityUrl.clockedOut,
+      data: bodyData,
+    })
   }
+
+  const isActive = data?.data?.is_clocked_in
+
+  const distanceInMins =
+    data?.data?.clocked_in_at &&
+    formatDistanceToNow(data?.data?.clocked_in_at, {
+      addSuffix: true,
+      includeSeconds: true,
+    })
+
+  useEffect(() => {
+    fetcher(activityUrl.clockedStatus)
+  }, [fetcher])
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="border-b">
         <CardTitle>
-          <div className="flex items-center gap-2">
-            <Clock10 />
-            Time Tracking
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-lg">
+              <Clock10 />
+              Time Tracking
+            </div>
+            <Badge variant="secondary" className={cn('w-fit rounded-full', isActive ? 'bg-green-400' : 'bg-red-400')}>
+              <Clock4 className="mr-2 size-4" />
+              <p className={cn('text-md')}>{isActive ? 'Active' : 'Inactive'}</p>
+            </Badge>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex justify-center gap-4">
-          <Button className="w-36" onClick={handleClockedIn}>
+        <div className="mt-6 flex justify-center gap-4">
+          <Button
+            isLoading={isSubmitting}
+            disabled={data?.data?.is_clocked_in}
+            className="w-36"
+            onClick={handleClockedIn}
+          >
             <LogIn />
             Clock In
           </Button>
-          <Button className="w-36" onClick={handleClockedOut}>
+          <Button
+            isLoading={isSubmitting}
+            disabled={!data?.data?.is_clocked_in}
+            className="w-36"
+            onClick={handleClockedOut}
+          >
             <LogOut />
             Clock Out
           </Button>
@@ -111,8 +158,18 @@ const TimeTracking = () => {
       </CardContent>
       <CardFooter className="flex items-center justify-center">
         <div className="">
-          <p className="font-semibold text-muted-foreground">Current status</p>
-          <p className="font-semibold">Not Clocked In</p>
+          {isLoading ? (
+            <Skeleton className="h-8 w-28" />
+          ) : (
+            <div className="flex items-center justify-center">
+              {isActive && (
+                <div>
+                  <div className="text-center text-lg font-semibold">Clocked in for</div>
+                  <div className="flex items-center">{`${distanceInMins}`}</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </CardFooter>
     </Card>
