@@ -13,6 +13,8 @@ export const authMiddleware = async (c: Context, next: () => Promise<void>) => {
     '/api/auth/reset-password',
     '/api/auth/refresh-token',
     '/api/user/register',
+    '/api/user/add-site',
+    '/api/user/add-role',
   ]
 
   // Exclude login and register routes

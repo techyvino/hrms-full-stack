@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm'
 import {
   doublePrecision,
   integer,
@@ -8,14 +7,15 @@ import {
 } from 'drizzle-orm/pg-core'
 
 import { usersTable } from '@/db/schemas/user.schema'
+import { defaultColumns } from '@/lib/sql'
 
 export const activityLogTable = pgTable('activity_log', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   user_id: integer('user_id')
     .references(() => usersTable.id)
     .notNull(),
-  clock_in: varchar('clock_in'),
-  clock_out: varchar('clock_out'),
+  clock_in: timestamp('clock_in', { withTimezone: true }),
+  clock_out: timestamp('clock_out', { withTimezone: true }),
   latitude: doublePrecision(),
   longitude: doublePrecision(),
   speed: integer(),
@@ -24,10 +24,5 @@ export const activityLogTable = pgTable('activity_log', {
   locality: varchar(),
   area: varchar(),
   postal_code: varchar('postal_code'),
-  createdAt: timestamp('created_at')
-    .default(sql`now() AT TIME ZONE 'Asia/Kolkata'`)
-    .notNull(),
-  updatedAt: timestamp('updated_at')
-    .$onUpdateFn(() => new Date())
-    .notNull(),
+  ...defaultColumns,
 })

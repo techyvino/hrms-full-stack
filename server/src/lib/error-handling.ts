@@ -1,7 +1,7 @@
 import type { NeonDbError } from '@neondatabase/serverless'
 
 import env from '@/env.js'
-// eslint-disable-next-line unicorn/prevent-abbreviations
+
 export const dbError = (error: NeonDbError) => {
   const errorMessages: Record<string, string> = {
     '23505':

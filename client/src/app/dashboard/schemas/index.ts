@@ -21,3 +21,25 @@ export const punchClockSchema = z.object({
 })
 
 export type PunchClock = z.infer<typeof punchClockSchema>
+
+export interface ClockEntry {
+  id: number
+  clock_in: string
+  clock_out: string
+  date: string
+}
+
+export interface ClockedStatusData {
+  next_clock_action: 'in' | 'out'
+  entries: ClockEntry[]
+  clock_in_time: string
+  clock_out_time: string
+  istTimeStamp: string
+  adjusted_clock_in_time: string
+}
+
+export interface ClockedStatus {
+  status: number
+  success: boolean
+  data: ClockedStatusData
+}

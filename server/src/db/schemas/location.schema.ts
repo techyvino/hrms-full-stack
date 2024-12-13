@@ -1,12 +1,7 @@
-import {
-  doublePrecision,
-  integer,
-  pgTable,
-  timestamp,
-  varchar,
-} from 'drizzle-orm/pg-core'
+import { doublePrecision, integer, pgTable, varchar } from 'drizzle-orm/pg-core'
 
 import { usersTable } from '@/db/schemas/user.schema'
+import { defaultColumns } from '@/lib/sql'
 
 export const locationTrackerTable = pgTable('location_tracker', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -21,10 +16,5 @@ export const locationTrackerTable = pgTable('location_tracker', {
   area: varchar(),
   postal_code: varchar('postal_code'),
   timestamp: varchar(),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .$onUpdateFn(() => new Date())
-    .notNull(),
+  ...defaultColumns,
 })

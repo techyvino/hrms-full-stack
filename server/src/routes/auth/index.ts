@@ -15,7 +15,7 @@ import {
 import { createRouter } from '@/lib/create-app'
 import { dbError } from '@/lib/error-handling'
 import { respondHandler } from '@/lib/http-status'
-import { formatZodErrors, getRandomString } from '@/lib/utils'
+import { dateTimeNow, formatZodErrors, getRandomString } from '@/lib/utils'
 import {
   changePasswordSchema,
   forgotPasswordSchema,
@@ -102,9 +102,7 @@ authRouter.post(
 
       // Check if the user is already logged in
       if (user?.access_token) {
-        await db.update(loginLogs).set({
-          logout_time: new Date(),
-        })
+        await db.update(loginLogs).set({ logoutAt: dateTimeNow() })
       }
 
       const jwtPayload = {
@@ -120,9 +118,8 @@ authRouter.post(
       // Insert Login logs
       await db.insert(loginLogs).values({
         user_id: user.id,
-        login_time: new Date(),
-        logout_time: null,
         session_id: jwtPayload?.session_id,
+        loginAt: dateTimeNow(),
         ...rest,
       })
 
@@ -284,13 +281,13 @@ authRouter.post(
     },
   }),
   async (c) => {
-    const { email, id } = c.var.user
+    const session = c.var.user
 
     try {
       const [user] = await db
         .select()
         .from(usersTable)
-        .where(or(eq(usersTable.email, email), eq(usersTable.id, id)))
+        .where(eq(usersTable.id, session?.id))
         .limit(1)
 
       if (!user) {
@@ -298,16 +295,14 @@ authRouter.post(
           {
             message: 'Invalid username',
           },
-          404
+          401
         )
       }
 
       await db
         .update(loginLogs)
-        .set({
-          logout_time: new Date(),
-        })
-        .where(eq(loginLogs.user_id, user.id))
+        .set({ loginAt: dateTimeNow() })
+        .where(eq(loginLogs.session_id, session?.session_id))
         .returning()
 
       await db

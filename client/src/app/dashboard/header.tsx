@@ -13,7 +13,7 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await api.post(authUrl.logout)
-      window.location.href = '/'
+      window.location.href = '/auth/login'
     } catch (error) {
       console.error('error:', error)
       toast.error('Logout failed')

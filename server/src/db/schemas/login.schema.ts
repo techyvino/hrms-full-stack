@@ -7,14 +7,15 @@ import {
 } from 'drizzle-orm/pg-core'
 
 import { usersTable } from '@/db/schemas/user.schema'
+import { defaultColumns } from '@/lib/sql'
 
 export const loginLogs = pgTable('login_logs', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   user_id: integer('user_id')
     .references(() => usersTable.id)
     .notNull(),
-  login_time: timestamp('login_time'),
-  logout_time: timestamp('logout_time'),
+  loginAt: timestamp('login_at', { withTimezone: true }),
+  logoutAt: timestamp('logout_at', { withTimezone: true }),
   latitude: doublePrecision(),
   longitude: doublePrecision(),
   locality: varchar(),
@@ -27,8 +28,5 @@ export const loginLogs = pgTable('login_logs', {
   device_name: varchar(),
   device_model: varchar(),
   session_id: varchar(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).$onUpdateFn(
-    () => new Date()
-  ),
+  ...defaultColumns,
 })

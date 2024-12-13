@@ -9,14 +9,19 @@ export const formatDate = (date: string | Date): string => {
   return format(new Date(date), 'MMM dd, yyyy')
 }
 
-export const calculateDuration = (clockIn: string, clockOut: string | null): string => {
+export const calculateDuration = (
+  clockIn: string,
+  clockOut: string | null,
+  hoursSuffix: string = '',
+  minutesSuffix: string = ''
+): string => {
   if (!clockOut) return '--:--'
 
   const minutes = differenceInMinutes(new Date(clockOut), new Date(clockIn))
   const hours = Math.floor(minutes / 60)
   const remainingMinutes = minutes % 60
 
-  return `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}`
+  return `${hours.toString().padStart(2, '0')}${hoursSuffix}:${remainingMinutes.toString().padStart(2, '0')}${minutesSuffix}`
 }
 
 export const dateTimeNow = () => {

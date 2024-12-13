@@ -13,6 +13,7 @@
     "hookform",
     "hrms",
     "Kolkata",
+    "luxon",
     "nativegeocoder",
     "neondatabase",
     "nextui",
@@ -36,8 +37,5 @@
   "eslint.enable": true,
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.format.enable": true,
-  "eslint.nodePath": "./node_modules/eslint",
-  "editor.quickSuggestions": {
-    "strings": "on"
-  }
+  "eslint.nodePath": "./node_modules/eslint"
 }

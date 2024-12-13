@@ -16,3 +16,14 @@ export const getRandomString = () => {
   const randomString = crypto.randomUUID().toString()
   return `${timestamp}-${randomString}`
 }
+
+export const istDateTimeNow = () => {
+  const now = new Date()
+  // Convert to IST
+  const istOffset = 5.5 * 60 * 60 * 1000 // IST is UTC+5:30
+  return new Date(now.getTime() + istOffset)
+}
+
+export const dateTimeNow = () => {
+  return new Date()
+}

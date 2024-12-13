@@ -6,8 +6,6 @@ import { responseSchema } from '@/routes/auth/zod'
 
 export const punchClockRequestSchema = z.object({
   clock_action: z.enum(['in', 'out']),
-  clock_in: z.string().nullable().optional(),
-  clock_out: z.string().nullable().optional(),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   speed: z.number().nullable().optional(),
