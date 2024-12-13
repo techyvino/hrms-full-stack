@@ -4,6 +4,8 @@ import { Geolocation } from '@capacitor/geolocation'
 import type { BackgroundGeolocationPlugin, CallbackError, Location } from '@capacitor-community/background-geolocation'
 import { type Address, NativeGeocoder } from '@capgo/nativegeocoder'
 
+import { IsNative } from '@/lib/utils'
+
 export const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation')
 
 type CallbackFunction = (location: Location | null, error: CallbackError | null) => void
@@ -31,12 +33,28 @@ export const formateLocationInfo = ({ address, position, location }: formateLoca
 }
 
 export const checkLocationPermission = async () => {
-  return (await Geolocation.checkPermissions())?.location
+  if (IsNative) {
+    return (await Geolocation.checkPermissions())?.location
+  } else {
+    return 'denied'
+  }
 }
 export const reqLocationPermission = async () => {
+  if (!IsNative) {
+    return 'denied'
+  }
   return await Geolocation.requestPermissions()
 }
 export const getCurrentLocation = async () => {
+  if (!IsNative) {
+    const position: Position = {} as Position
+    // Use a Promise to wrap the navigator API
+    navigator.geolocation.getCurrentPosition((pos) => {
+      position.coords = pos.coords
+      position.timestamp = pos.timestamp
+    })
+    return position
+  }
   return await Geolocation.getCurrentPosition()
 }
 

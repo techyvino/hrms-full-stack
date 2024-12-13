@@ -1,9 +1,7 @@
 import { formatDistanceToNow } from 'date-fns'
-import { Clock4, Clock10, LogIn, LogOut } from 'lucide-react'
+import { Clock4, Clock10, LogIn } from 'lucide-react'
 import React, { useCallback, useEffect } from 'react'
-import type { z } from 'zod'
 
-import type { activityLogCreateSchema } from '@/app/dashboard/schemas'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,14 +19,17 @@ interface ClockedStatus {
   status: number
   success: boolean
   data: {
-    is_clocked_in: boolean
-    clocked_in_at: string | null
-    clocked_out_at: string | null
+    next_clock_action: 'in' | 'out'
+    entries: unknown[]
+    clock_in_time: string
+    clock_out_time: string
+    istTimeStamp: string
+    adjusted_clock_in_time: string
   }
 }
 
 const TimeTracking = () => {
-  const { data, isLoading, fetcher } = useFetch<ClockedStatus>()
+  const { response, isLoading, fetcher } = useFetch<ClockedStatus>()
 
   const { submit, isLoading: isSubmitting } = useSubmit({
     onSuccess: (res) => {
@@ -69,47 +70,28 @@ const TimeTracking = () => {
 
   // Create a DateTime object in IST
 
-  const handleClockedIn = async () => {
+  const handlePunchClock = async () => {
     const deviceInfo = await getDeviceInfo()
 
-    const locationInfo = await getCurrentAddress()
-    const bodyData: z.infer<typeof activityLogCreateSchema> = {
-      ...locationInfo,
+    // const locationInfo = await getCurrentAddress()
+    const bodyData = {
+      // ...locationInfo,
       ...deviceInfo,
+      clock_action: response?.data?.next_clock_action,
       clock_in: dateTimeNow(),
       clock_out: null,
     }
     submit({
-      url: activityUrl.clockedIn,
+      url: activityUrl.punchClock,
       data: bodyData,
     })
   }
 
-  const handleClockedOut = async () => {
-    const deviceInfo = await getDeviceInfo()
-
-    const position = await getCurrentLocation()
-    const address = await getAddressFromCoordinates(position?.coords?.latitude, position?.coords.longitude)
-    const formattedLocation = formateLocationInfo({
-      position,
-      address,
-    })
-    const bodyData: z.infer<typeof activityLogCreateSchema> = {
-      ...formattedLocation,
-      ...deviceInfo,
-      clock_out: dateTimeNow(),
-    }
-    submit({
-      url: activityUrl.clockedOut,
-      data: bodyData,
-    })
-  }
-
-  const isActive = data?.data?.is_clocked_in
+  const isActive = response?.data?.clock_in_time
 
   const distanceInMins =
-    data?.data?.clocked_in_at &&
-    formatDistanceToNow(data?.data?.clocked_in_at, {
+    response?.data?.clock_in_time &&
+    formatDistanceToNow(response?.data?.clock_in_time, {
       addSuffix: true,
       includeSeconds: true,
     })
@@ -136,23 +118,9 @@ const TimeTracking = () => {
       </CardHeader>
       <CardContent>
         <div className="mt-6 flex justify-center gap-4">
-          <Button
-            isLoading={isSubmitting}
-            disabled={data?.data?.is_clocked_in}
-            className="w-36"
-            onClick={handleClockedIn}
-          >
+          <Button isLoading={isSubmitting} className="w-36" onClick={handlePunchClock}>
             <LogIn />
-            Clock In
-          </Button>
-          <Button
-            isLoading={isSubmitting}
-            disabled={!data?.data?.is_clocked_in}
-            className="w-36"
-            onClick={handleClockedOut}
-          >
-            <LogOut />
-            Clock Out
+            {response?.data?.next_clock_action === 'in' ? 'Clock In' : 'Clock Out'}
           </Button>
         </div>
       </CardContent>

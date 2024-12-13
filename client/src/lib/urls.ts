@@ -6,9 +6,8 @@ export const authUrl = {
 }
 
 export const activityUrl = {
-  clockedStatus: `/clocked-status`,
-  clockedIn: '/clock-in',
-  clockedOut: '/clock-out',
+  clockedStatus: `/clockStatus`,
+  punchClock: '/punchClock',
 }
 
 export const userUrl = {

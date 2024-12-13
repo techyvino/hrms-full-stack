@@ -11,7 +11,7 @@ export interface UseFetchOptions<T> {
 }
 
 export interface UseFetchResult<T> {
-  data: T | undefined
+  response: T | undefined
   error: AxiosError | null
   isLoading: boolean
   isError: boolean
@@ -23,7 +23,7 @@ export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetc
 
   const [axiosConfig, setAxiosConfig] = useState<AxiosRequestConfig>()
 
-  const [data, setData] = useState<T | undefined>(initialData)
+  const [response, setResponse] = useState<T | undefined>(initialData)
   const [error, setError] = useState<AxiosError | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -40,15 +40,13 @@ export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetc
       abortControllerRef.current = abortController
 
       // Pass the signal to axios
-      const response = await api.request<T>({
+      const { data } = await api.request<T>({
         ...axiosConfig,
         signal: abortController.signal,
       })
 
-      // Only update state if the component is still mounted
-      const responseData = response.data
-      setData(responseData)
-      onSuccess?.(responseData)
+      setResponse(data)
+      onSuccess?.(data)
     } catch (err) {
       if (err instanceof AxiosError && axios.isCancel(err)) {
         // Ignore request cancellation
@@ -64,8 +62,8 @@ export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetc
 
   const fetcher = useCallback(async (reqConfig: AxiosRequestConfig | string) => {
     if (typeof reqConfig === 'string') {
-      await setAxiosConfig({ url: reqConfig, method: 'GET' })
-    } else if (reqConfig?.url) await setAxiosConfig(reqConfig)
+      setAxiosConfig({ url: reqConfig, method: 'GET' })
+    } else if (reqConfig?.url) setAxiosConfig(reqConfig)
   }, [])
 
   useEffect(() => {
@@ -85,7 +83,7 @@ export function useFetch<T = unknown>(options: UseFetchOptions<T> = {}): UseFetc
   }, [])
 
   return {
-    data,
+    response,
     error,
     isLoading,
     fetcher,

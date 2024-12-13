@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import {
   doublePrecision,
   integer,
@@ -23,10 +24,10 @@ export const activityLogTable = pgTable('activity_log', {
   locality: varchar(),
   area: varchar(),
   postal_code: varchar('postal_code'),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
+  createdAt: timestamp('created_at')
+    .default(sql`now() AT TIME ZONE 'Asia/Kolkata'`)
     .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
+  updatedAt: timestamp('updated_at')
     .$onUpdateFn(() => new Date())
     .notNull(),
 })

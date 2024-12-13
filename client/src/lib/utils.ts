@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { ZodSchema } from 'zod'
@@ -16,3 +17,5 @@ export const transformEmptyStringToNull = (
 ) => schema.transform((val) => trim(val) || null)
 
 export const transformTrimmedString = (schema: ZodSchema<string> = z.string()) => schema.transform((val) => trim(val))
+
+export const IsNative = Capacitor.isNativePlatform()

@@ -5,7 +5,6 @@ import { Inter } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 
 import AuthWrapper from '@/app/auth-wrapper'
-import { AccountContextProvider } from '@/contexts/AccountContext'
 import { cn } from '@/lib/utils'
 
 import NoSSRWrapper from './no-ssr-wrapper'
@@ -26,7 +25,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={cn(inter?.className, 'font-sans', 'antialiased')}>
         <NoSSRWrapper>
-          <AccountContextProvider>
+          <>
             <AuthWrapper>{children}</AuthWrapper>
             <Toaster
               toastOptions={{
@@ -35,7 +34,7 @@ export default function RootLayout({
                 },
               }}
             />
-          </AccountContextProvider>
+          </>
         </NoSSRWrapper>
       </body>
     </html>

@@ -1,8 +1,7 @@
 'use client'
 import { getCookie } from 'cookies-next/client'
 import { jwtDecode } from 'jwt-decode'
-import type { ReactNode } from 'react'
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export interface User {
   name: string
@@ -11,9 +10,7 @@ export interface User {
   role_id: number
 }
 
-export const AccountContext = createContext<User>({} as User)
-
-export const AccountContextProvider = ({ children }: { children: ReactNode }) => {
+export const useAccount = () => {
   const [account, setAccount] = useState<User>({} as User)
   const token = getCookie('access_token')
 
@@ -23,14 +20,8 @@ export const AccountContextProvider = ({ children }: { children: ReactNode }) =>
       if (id) {
         setAccount({ user_id: id, email, name, role_id })
       }
-
-      // setAccount(JSON.parse(account))
     }
   }, [token])
 
-  return <AccountContext.Provider value={{ ...account }}>{children}</AccountContext.Provider>
+  return account
 }
-
-export const useAccountContext = () => useContext(AccountContext)
-
-export default AccountContext
