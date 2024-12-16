@@ -1,3 +1,4 @@
+'use client'
 import { Link, Snippet, Code } from '@nextui-org/react'
 import { button as buttonStyles } from '@nextui-org/theme'
 
