@@ -6,7 +6,6 @@ import { useCallback, useEffect } from 'react'
 
 import { TimeHistory } from '@/app/dashboard/components/time-history'
 import TimeTracking from '@/app/dashboard/components/time-tracking'
-import Header from '@/app/dashboard/header'
 import type { ClockedStatus } from '@/app/dashboard/schemas'
 import { useAccount } from '@/hooks/useAccount'
 import { useFetch } from '@/hooks/useFetch'
@@ -84,7 +83,6 @@ export default function Home() {
 
   return (
     <main>
-      <Header />
       <div className="m-5 flex justify-between gap-5">
         <Card className="flex h-20 w-1/2 items-center justify-center">
           <CardBody className="flex items-center gap-2 font-bold">

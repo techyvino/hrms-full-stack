@@ -3,6 +3,8 @@ import toast from 'react-hot-toast'
 
 import { authUrl } from '@/lib/urls'
 import api from '@/services/api'
+import { Button } from '@nextui-org/react'
+import { LogOut } from 'lucide-react'
 
 const Header = () => {
   const handleLogout = async () => {
@@ -27,13 +29,13 @@ const Header = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="mx-5 border bg-slate-50">
           <DropdownMenuItem>
-            <Button onClick={handleLogout} variant={'link'} className="flex items-center gap-3">
-              <LogOut />
-              <p>Logout</p>
-            </Button>
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu> */}
+          </DropdownMenuContent>
+          </DropdownMenu> */}
+      <Button onPress={handleLogout} variant={'light'} className="flex items-center gap-3">
+        <LogOut />
+        <p>Logout</p>
+      </Button>
     </div>
   )
 }
