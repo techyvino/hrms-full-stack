@@ -1,4 +1,4 @@
-import { Badge, Button, Card, CardBody, CardFooter, CardHeader, Skeleton } from '@nextui-org/react'
+import { Badge, Button, Card, CardBody, CardHeader, Skeleton } from '@nextui-org/react'
 import { Clock4, Clock10, LogIn } from 'lucide-react'
 import React from 'react'
 
@@ -35,15 +35,13 @@ const TimeTracking = ({ handlePunchClock, data, isLoading, isSubmitting }: TimeT
         </div>
       </CardHeader>
       <CardBody>
-        <div className="mt-5 flex justify-center gap-4">
+        <div className="my-5 flex justify-center gap-4">
           <Button color="primary" variant="shadow" isLoading={isSubmitting} className="w-36" onPress={handlePunchClock}>
             <LogIn />
             {data?.next_clock_action === 'in' ? 'Clock In' : 'Clock Out'}
           </Button>
         </div>
-      </CardBody>
-      <CardFooter className="flex items-center justify-center">
-        <div className="">
+        <div className="flex justify-center">
           {isLoading ? (
             <Skeleton className="h-8 w-28" />
           ) : (
@@ -59,7 +57,7 @@ const TimeTracking = ({ handlePunchClock, data, isLoading, isSubmitting }: TimeT
             </>
           )}
         </div>
-      </CardFooter>
+      </CardBody>
     </Card>
   )
 }
