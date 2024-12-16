@@ -1,5 +1,5 @@
 import type { NeonDbError } from '@neondatabase/serverless'
-import { eq, getTableColumns } from 'drizzle-orm'
+import { eq, getTableColumns, ilike, or } from 'drizzle-orm'
 import { describeRoute } from 'hono-openapi'
 import { resolver, validator } from 'hono-openapi/zod'
 import type { z } from 'zod'
@@ -13,10 +13,12 @@ import { createRouter } from '@/lib/create-app'
 import { dbError } from '@/lib/error-handling'
 import { respondHandler } from '@/lib/http-status'
 import { formatZodErrors } from '@/lib/utils'
+import { zodValidator } from '@/middleware/zod-validator'
 import { responseSchema } from '@/routes/auth/zod'
 import {
   getUserDetailsResponse,
   getUserListResponse,
+  paramUserIdSchema,
   signUpValuesSchema,
   updateUserValuesSchema,
 } from '@/routes/user/zod'
@@ -93,20 +95,15 @@ userRouter.post(
       },
     },
   }),
-  validator('json', updateUserValuesSchema, (result, c) => {
-    if (!result.success) {
-      return c.json(formatZodErrors(result?.error), 400)
-    }
-  }),
+  zodValidator('json', updateUserValuesSchema),
   async (c) => {
-    const body: z.infer<typeof signUpValuesSchema> = await c.req.json()
-    const { id } = c.var.user
+    const body: z.infer<typeof updateUserValuesSchema> = await c.req.json()
 
     try {
       const result = await db
         .update(usersTable)
         .set({ ...body })
-        .where(eq(usersTable.id, id))
+        .where(eq(usersTable.id, body?.user_id))
         .returning()
 
       if (result?.length === 0) {
@@ -123,7 +120,7 @@ userRouter.post(
 
 // get user info by id
 userRouter.get(
-  '/user',
+  '/user/:id',
   describeRoute({
     summary: 'Get user',
     description: 'Get user details by id',
@@ -139,8 +136,9 @@ userRouter.get(
       },
     },
   }),
+  zodValidator('param', paramUserIdSchema),
   async (c) => {
-    const userId = c.var.user.id
+    const userId = Number(c.req.param('id'))
 
     if (!userId) {
       return respondHandler(c, 'not_found', 'Invalid user id')
@@ -228,6 +226,7 @@ userRouter.get(
   }),
   async (c) => {
     try {
+      const searchTerm = c.req.query('q') || ''
       const {
         id,
         department,
@@ -259,12 +258,16 @@ userRouter.get(
           role_name: roleTypeTable.name,
         })
         .from(usersTable)
+        .where(
+          or(
+            ilike(usersTable.name, `%${searchTerm}%`),
+            ilike(usersTable.email, `%${searchTerm}%`),
+            ilike(usersTable.mobile_no, `%${searchTerm}%`)
+          )
+        )
         .leftJoin(sitesTable, eq(usersTable.site_id, sitesTable.id))
         .leftJoin(roleTypeTable, eq(usersTable.role_id, roleTypeTable.id))
 
-      if (result.length === 0) {
-        return respondHandler(c, 'unauthorized', 'Invalid user')
-      }
       return respondHandler(c, 'success', result)
     } catch (error) {
       return respondHandler(c, 'server_error', dbError(error as NeonDbError))

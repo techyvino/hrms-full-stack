@@ -45,15 +45,19 @@ export const signUpValuesSchema = z.object({
 })
 
 // Update user values schema
-export const updateUserValuesSchema = signUpValuesSchema.omit({
-  mobile_no: true,
-  email: true,
-  password: true,
-})
+export const updateUserValuesSchema = signUpValuesSchema
+  .omit({
+    mobile_no: true,
+    email: true,
+    password: true,
+  })
+  .extend({
+    user_id: z.number(),
+  })
 
 // GET - Get user details by ID - Request
 export const paramUserIdSchema = z.object({
-  id: z.coerce.number({ message: 'User id is required' }),
+  id: z.string({ message: 'User id is required' }),
 })
 
 // GET - Get user details by ID - Response
@@ -105,24 +109,24 @@ export const getUserDetailsResponse = responseSchema
 
 // GET - Get user List - Response
 
+export const UserSchema = z.object({
+  id: z.number(),
+  department: z.string(),
+  designation: z.string(),
+  email: z.string().email(),
+  mobile_no: z.string(),
+  gender: z.string(),
+  joined_date: z.string(),
+  live_tracker_enabled: z.boolean(),
+  marital_status: z.string(),
+  name: z.string(),
+  status: z.string(),
+  site_name: z.string(),
+  role_name: z.string(),
+})
+
 export const getUserListResponse = responseSchema
   .omit({ message: true })
   .extend({
-    data: z.array(
-      z.object({
-        id: z.number(),
-        department: z.string(),
-        designation: z.string(),
-        email: z.string().email(),
-        mobile_no: z.string(),
-        gender: z.string(),
-        joined_date: z.string(),
-        live_tracker_enabled: z.boolean(),
-        marital_status: z.string(),
-        name: z.string(),
-        status: z.string(),
-        site_name: z.string(),
-        role_name: z.string(),
-      })
-    ),
+    data: z.array(UserSchema),
   })

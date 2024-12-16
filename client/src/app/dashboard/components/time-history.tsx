@@ -14,14 +14,14 @@ export const TimeHistory = ({ entries }: { entries: ClockEntry[] }) => {
   return (
     <div className="rounded-lg bg-white shadow">
       <div className="border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center">
-          <History className="mr-2 size-5 text-gray-600" />
-          <h3 className="text-lg font-medium text-gray-900">Time History</h3>
+        <div className="flex items-center font-semibold text-lg gap-2">
+          <History />
+          <h3 className="">Today's Clocked History</h3>
         </div>
       </div>
       <div className="divide-y divide-gray-200">
         {entries?.length === 0 ? (
-          <div>No History</div>
+          <div className="p-4 flex items-center justify-center font-semibold">Clocked history not found</div>
         ) : (
           entries?.map((entry) => (
             <div key={entry.id} className="px-6 py-4">

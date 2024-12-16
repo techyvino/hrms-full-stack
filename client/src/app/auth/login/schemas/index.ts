@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { User } from '@/contexts/AccountContext'
+import type { User } from '@/hooks/useAccount'
 import { transformTrimmedString } from '@/lib/utils'
 
 export const loginSchema = z.object({

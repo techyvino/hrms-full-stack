@@ -8,6 +8,7 @@ import AuthWrapper from '@/app/auth-wrapper'
 import { cn } from '@/lib/utils'
 
 import NoSSRWrapper from './no-ssr-wrapper'
+import PullToPageRefresh from '@/app/pull-to-refresh'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className={cn(inter?.className, 'font-sans', 'antialiased')}>
         <NoSSRWrapper>
           <>
+            <PullToPageRefresh />
             <AuthWrapper>{children}</AuthWrapper>
             <Toaster
               toastOptions={{

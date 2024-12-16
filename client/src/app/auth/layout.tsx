@@ -22,7 +22,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   }, [])
 
   return (
-    <div className="flex h-screen flex-col justify-between">
+    <div className="flex flex-col justify-between">
       <h6 className="float-start p-3 font-semibold">hrms</h6>
       {children}
       <svg

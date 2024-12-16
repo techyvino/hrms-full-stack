@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'arvi-hrms-client',
   webDir: 'out',
   server: {
-    url: 'http://192.168.0.111:5000',
+    url: 'http://192.168.0.108:5000',
     cleartext: true,
   },
 }
