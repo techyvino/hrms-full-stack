@@ -1,56 +1,89 @@
 'use client'
 
-import { useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { Select, SelectItem, SelectItemProps, SelectProps } from '@nextui-org/react'
 
-export interface SelectFormProps {
+export interface SelectFormProps extends SelectProps {
   name: string
   label: React.ReactNode
   options: ItemOption[]
   placeholder?: string
+  noLabelText?: string
   description?: React.ReactNode
+  isMultiple?: boolean
   containerClassName?: HTMLDivElement['className']
+  selectItemProps?: SelectItemProps
+  valueKey: keyof ItemOption
+  displayNameKey: keyof ItemOption
 }
 
 export const SelectForm = ({
   containerClassName,
   name,
   label,
-  options = [],
-  placeholder = 'Select',
   description,
+  selectItemProps,
+  options = [],
+  isLoading = false,
+  isDisabled = false,
+  isRequired = false,
+  isMultiple = false,
+  valueKey = 'value',
+  displayNameKey = 'label',
+  noLabelText = 'No Label',
+  ...rest
 }: SelectFormProps) => {
-  const { control } = useFormContext()
+  const { control, getFieldState, formState } = useFormContext()
+
+  const { error } = getFieldState(name, formState)
 
   return (
     <div className={cn(containerClassName)}>
-      <FormField
+      <Controller
         control={control}
         name={name}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{label}</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder={placeholder} />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {options?.map((option) => (
-                  <SelectItem key={option?.value || option?.name} value={option?.value}>
-                    {option?.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+        key={name}
+        render={({ field: { value: selectedKey, onChange, ...restField } }) => {
+          return (
+            <Select
+              label={label || ''}
+              aria-labelledby="select"
+              aria-label="select-input"
+              isLoading={isLoading}
+              isDisabled={isDisabled}
+              color={error?.message ? 'danger' : 'default'}
+              selectionMode={isMultiple ? 'multiple' : 'single'}
+              isRequired={!!isRequired}
+              errorMessage={error?.message?.toString() || ''}
+              isInvalid={!!error?.message?.toString() || undefined}
+              selectedKeys={isMultiple ? selectedKey : selectedKey ? [selectedKey] : []}
+              onSelectionChange={(val) => {
+                // For Single Selection
+                const singleSelectVal = [...val][0] || ''
+                isMultiple ? onChange([...val]) : onChange(singleSelectVal)
+              }}
+              description={description || ''}
+              key={`select_${name}`}
+              items={options || []}
+              required={isRequired}
+              {...restField}
+              {...rest}
+            >
+              {(option: any) => (
+                <SelectItem
+                  {...selectItemProps}
+                  key={option?.[valueKey]}
+                  value={option?.[valueKey]}
+                  textValue={option?.[displayNameKey] || ''}
+                >
+                  {option?.[displayNameKey] || noLabelText}
+                </SelectItem>
+              )}
             </Select>
-            <FormDescription>{description}</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
+          )
+        }}
       />
     </div>
   )

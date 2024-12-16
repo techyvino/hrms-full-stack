@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 
 import NoSSRWrapper from './no-ssr-wrapper'
 import PullToPageRefresh from '@/app/pull-to-refresh'
+import ThemeProvider from '@/app/theme-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,7 +27,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning className={cn(inter?.className, 'font-sans', 'antialiased')}>
         <NoSSRWrapper>
-          <>
+          <ThemeProvider>
             <PullToPageRefresh />
             <AuthWrapper>{children}</AuthWrapper>
             <Toaster
@@ -36,7 +37,7 @@ export default function RootLayout({
                 },
               }}
             />
-          </>
+          </ThemeProvider>
         </NoSSRWrapper>
       </body>
     </html>

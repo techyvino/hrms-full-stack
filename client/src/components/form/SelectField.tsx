@@ -56,8 +56,6 @@ const SelectField: (props: fieldType) => ReactNode = (props) => {
       return <CrAutoComplete {...exceptTypeProps} />
     case formTypes.switch:
       return <CrSwitch {...exceptTypeProps} />
-    case formTypes.slider:
-      return <CrSliderInput {...exceptTypeProps} />
     case formTypes.checkboxGroup:
       return <CrCheckBoxGroup {...(exceptTypeProps as CrCheckBoxGroupProps)} />
     default:

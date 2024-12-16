@@ -1,61 +1,66 @@
 'use client'
 
-import type * as CheckboxPrimitive from '@radix-ui/react-checkbox'
-import { useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 
-import { Checkbox } from '@/components/ui/checkbox'
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { cn } from '@/lib/utils'
+import { Checkbox, CheckboxGroup, CheckboxGroupProps as NextUICheckBoxGroup } from '@nextui-org/react'
 
-export interface CheckBoxGroupProps extends React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> {
+export interface CheckBoxGroupProps extends NextUICheckBoxGroup {
   name: string
   label: React.ReactNode
   description?: React.ReactNode
   options: ItemOption[]
+  valueKey: keyof ItemOption
+  displayNameKey: keyof ItemOption
   containerClassName?: HTMLDivElement['className']
 }
 
-export const CheckboxGroupForm = ({ containerClassName, name, label, description, options }: CheckBoxGroupProps) => {
-  const { control } = useFormContext()
+export const CheckboxGroupForm = ({
+  containerClassName,
+  name,
+  label,
+  options,
+  isRequired,
+  valueKey = 'value',
+  displayNameKey = 'label',
+  ...rest
+}: CheckBoxGroupProps) => {
+  const { control, getFieldState, formState } = useFormContext()
+  const { error } = getFieldState(name, formState)
+
   return (
     <div className={cn(containerClassName)}>
-      <FormField
-        control={control}
+      <Controller
         name={name}
-        render={() => (
-          <FormItem className="pb-2">
-            <FormLabel>{label}</FormLabel>
-            <FormDescription>{description}</FormDescription>
-            <div className="flex flex-col gap-2 px-4">
-              {options?.map((item, index) => (
-                <FormField
-                  key={item?.value || item?.name || `${item?.name}-${index}`}
-                  control={control}
-                  name={name}
-                  render={({ field: { value = [], onChange, ...restFields } }) => {
-                    return (
-                      <FormItem key={item?.value} className="flex flex-row items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={value?.includes(item?.value)}
-                            onCheckedChange={(checked) => {
-                              return checked
-                                ? onChange([...value, item.value])
-                                : onChange(value?.filter((val: string) => val !== item.value))
-                            }}
-                            {...restFields}
-                          />
-                        </FormControl>
-                        <FormLabel className="text-sm font-normal">{item.name}</FormLabel>
-                      </FormItem>
-                    )
-                  }}
-                />
-              ))}
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
+        key={name}
+        control={control}
+        render={({ field: { value: checkBoxValue, onChange, ...restField } }) => {
+          return (
+            <CheckboxGroup
+              label={label}
+              value={checkBoxValue}
+              onValueChange={(val) => {
+                onChange(val)
+              }}
+              classNames={{
+                wrapper: 'gap-4',
+              }}
+              isRequired={!!isRequired}
+              isInvalid={!!error?.message}
+              errorMessage={error?.message?.toString()}
+              validationBehavior="native"
+              {...restField}
+              {...rest}
+            >
+              {Array.isArray(options) &&
+                options.map((page, idx) => (
+                  <Checkbox key={page?.[valueKey] || `option_${idx + 1}`} value={page?.[valueKey]?.toString() ?? ''}>
+                    {page?.[displayNameKey] || 'NA'}
+                  </Checkbox>
+                ))}
+            </CheckboxGroup>
+          )
+        }}
       />
     </div>
   )

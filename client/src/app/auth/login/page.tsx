@@ -5,19 +5,17 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { setCookie } from 'cookies-next/client'
 import { Key, UserRound } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
-import type { LoginResponse } from '@/app/auth/login/schemas'
-import { type LoginSchema, loginSchema } from '@/app/auth/login/schemas'
 import { InputForm } from '@/components/form/InputForm'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form } from '@/components/ui/form'
+
 import { useSubmit } from '@/hooks/useSubmit'
 import { getDeviceInfo } from '@/lib/device'
 import { formateLocationInfo, getAddressFromCoordinates, getCurrentLocation } from '@/lib/geolocation'
 import { authUrl } from '@/lib/urls'
+import { LoginResponse, loginSchema, LoginSchema } from '@/app/auth/login/schemas'
+import { Button, Card, CardBody, CardHeader, Form } from '@nextui-org/react'
 
 export default function LoginForm() {
   const { push } = useRouter()
@@ -86,34 +84,32 @@ export default function LoginForm() {
   })
 
   return (
-    <section className="z-10 h-full">
-      <Card className="mx-4 my-40 flex h-full flex-col border-none bg-transparent shadow-none md:items-center">
-        <CardHeader>
-          <CardTitle className="text-4xl font-bold md:text-center">Sign in</CardTitle>
-          <CardDescription className="text-sm text-gray-400">Please fill the credentials</CardDescription>
+    <section className="z-10 h-full w-full flex flex-col items-center justify-center">
+      <Card className="my-40 flex h-full flex-col border-none bg-transparent shadow-none md:items-center">
+        <CardHeader className="flex-col items-start gap-1">
+          <div className="text-4xl font-bold md:text-center">Sign in</div>
+          <div className="text-sm text-gray-400">Please fill the credentials</div>
         </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={onSubmit}>
+        <CardBody>
+          <FormProvider {...form}>
+            <Form onSubmit={onSubmit}>
               <InputForm
                 name="username"
-                icon={<UserRound className="stroke-gray-400" />}
-                iconPosition="left"
+                startContent={<UserRound className="stroke-gray-400" />}
                 placeholder="Username"
               />
               <InputForm
                 name="password"
                 type="password"
-                icon={<Key className="stroke-gray-400" />}
-                iconPosition="left"
+                startContent={<Key className="stroke-gray-400" />}
                 placeholder="Password"
               />
-              <Button isLoading={isLoading} type="submit" className="mt-4 w-full">
+              <Button color="primary" variant="solid" isLoading={isLoading} type="submit" className="mt-4 w-full">
                 Login
               </Button>
-            </form>
-          </Form>
-        </CardContent>
+            </Form>
+          </FormProvider>
+        </CardBody>
         {/* <CardFooter className="flex justify-center">
           <Link href="/auth/forgot-password" className="text-sm text-blue-600 hover:underline">
             Forgot Password?

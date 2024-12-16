@@ -1,22 +1,20 @@
 import type { FC } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
+import { Textarea, TextAreaProps } from '@nextui-org/react'
 
-export interface TextAreaFormProps extends React.ComponentProps<'textarea'> {
+export interface TextAreaFormProps extends TextAreaProps {
   name: string
   containerClassName?: HTMLDivElement['className']
   label?: React.ReactNode
-  description?: React.ReactNode
 }
 
 export const TextAreaForm: FC<TextAreaFormProps> = ({
   containerClassName = 'w-full',
   name = '',
   label = '',
-  description = '',
+  isRequired = false,
   required,
   className,
   ...rest
@@ -27,26 +25,22 @@ export const TextAreaForm: FC<TextAreaFormProps> = ({
 
   return (
     <div className={cn(containerClassName)}>
-      <FormField
-        control={control}
+      <Controller
         name={name}
+        control={control}
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              {label}
-              {required ? '*' : ''}
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                {...field}
-                {...rest}
-                required={required}
-                className={cn(error?.message && 'border-destructive focus-visible:ring-destructive', className)}
-              />
-            </FormControl>
-            <FormDescription>{description}</FormDescription>
-            <FormMessage />
-          </FormItem>
+          <Textarea
+            fullWidth
+            id={name}
+            label={label}
+            isRequired={isRequired}
+            required={isRequired}
+            color={error?.message ? 'danger' : 'default'}
+            isInvalid={!!error?.message}
+            errorMessage={error?.message}
+            {...field}
+            {...rest}
+          />
         )}
       />
     </div>

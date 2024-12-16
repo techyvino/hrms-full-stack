@@ -1,11 +1,9 @@
 import type { FC } from 'react'
 import React from 'react'
-import { useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import type { InputProps } from '@/components/ui/input'
-import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
+import { Input, InputProps } from '@nextui-org/react'
 
 export interface InputFormProps extends InputProps {
   name: string
@@ -23,25 +21,35 @@ export const InputForm: FC<InputFormProps> = ({
   required,
   ...rest
 }) => {
-  const { control } = useFormContext()
+  const { control, getFieldState, formState } = useFormContext()
+
+  const { error } = getFieldState(name, formState)
 
   return (
     <div className={cn(containerClassName)}>
-      <FormField
-        control={control}
+      <Controller
         name={name}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              {label}
-              {required ? '*' : ''}
-            </FormLabel>
-            <FormControl>
-              <Input {...field} {...rest} type={type} required={required} />
-            </FormControl>
-            <FormDescription>{description}</FormDescription>
-            <FormMessage />
-          </FormItem>
+        control={control}
+        render={({ field: { value, onChange, ...restField } }) => (
+          <Input
+            fullWidth
+            id={name}
+            label={label}
+            type={type}
+            errorMessage={error?.message}
+            isRequired={!!required}
+            onChange={(e) => {
+              const val = e.target?.value
+              return onChange(type === 'number' && val ? `${Number(val)}` : val.trimStart())
+            }}
+            value={value || ''}
+            validationBehavior="native"
+            step="any"
+            required={!!required}
+            isInvalid={!!error?.message}
+            {...restField}
+            {...rest}
+          />
         )}
       />
     </div>

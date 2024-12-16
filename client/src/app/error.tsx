@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@nextui-org/react'
 import { useEffect } from 'react'
 
 export default function GlobalError({
@@ -19,7 +19,7 @@ export default function GlobalError({
     <div className="flex flex-col h-[85vh] justify-center items-center">
       <h1 className="text-7xl font-bold my-5">Oops!</h1>
       <p className="text-danger font-semibold">{error?.message ?? 'Something went wrong'}</p>
-      <Button variant={'destructive'} className="mt-10" onClick={reset}>
+      <Button variant="shadow" className="mt-10" onPress={reset}>
         Try Again
       </Button>
     </div>
