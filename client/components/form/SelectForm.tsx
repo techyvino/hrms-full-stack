@@ -59,30 +59,33 @@ export const SelectForm = ({
               isInvalid={!!error?.message?.toString() || undefined}
               isLoading={isLoading}
               isRequired={!!isRequired}
-              items={options || []}
               label={label || ''}
               required={isRequired}
               selectedKeys={isMultiple ? selectedKey : selectedKey ? [selectedKey] : []}
               selectionMode={isMultiple ? 'multiple' : 'single'}
               onSelectionChange={(val) => {
                 // For Single Selection
-                const singleSelectVal = [...val][0] || ''
+                const singleSelectVal = [val][0] || ''
 
-                isMultiple ? onChange([...val]) : onChange(singleSelectVal)
+                if (isMultiple) {
+                  return onChange([val])
+                } else {
+                  return onChange(singleSelectVal)
+                }
               }}
               {...restField}
               {...rest}
             >
-              {(option: any) => (
+              {options?.map((option) => (
                 <SelectItem
                   {...selectItemProps}
                   key={option?.[valueKey]}
-                  textValue={option?.[displayNameKey] || ''}
+                  textValue={option?.[displayNameKey].toString() || ''}
                   value={option?.[valueKey]}
                 >
                   {option?.[displayNameKey] || noLabelText}
                 </SelectItem>
-              )}
+              ))}
             </Select>
           )
         }}

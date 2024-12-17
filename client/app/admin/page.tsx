@@ -1,4 +1,5 @@
 'use client'
+import { Button, Input } from '@nextui-org/react'
 import { Loader, SearchIcon } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
@@ -6,8 +7,6 @@ import React, { useEffect } from 'react'
 import { columns } from '@/app/admin/columns'
 import { DataTable } from '@/app/admin/data-table'
 import type { UserListResponse } from '@/app/admin/schema'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useFetch } from '@/hooks/useFetch'
 import { getDatesOfMonth } from '@/lib/date-utils'
@@ -26,12 +25,9 @@ const Page = () => {
 
   const year = new Date().getFullYear()
 
-  console.log('year:', year)
   const month = new Date().getMonth() + 1
 
-  console.log('month:', month)
-
-  console.log('getDatesOfMonth', getDatesOfMonth(2024, 12))
+  console.log('getDatesOfMonth', getDatesOfMonth(year, month))
 
   return (
     <div className="p-4">
@@ -41,9 +37,9 @@ const Page = () => {
           classNames={{
             base: 'my-3 w-[45%]',
           }}
-          icon={<SearchIcon />}
-          iconPosition="left"
+          name="search"
           placeholder="Search with Name, Email and Mobile number..."
+          startContent={<SearchIcon />}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

@@ -10,7 +10,6 @@ export interface InputFormProps extends InputProps {
   name: string
   containerClassName?: HTMLDivElement['className']
   label?: React.ReactNode
-  description?: React.ReactNode
 }
 
 export const InputForm: FC<InputFormProps> = ({
@@ -18,7 +17,6 @@ export const InputForm: FC<InputFormProps> = ({
   name = '',
   type = 'text',
   label = '',
-  description = '',
   required,
   ...rest
 }) => {

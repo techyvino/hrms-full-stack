@@ -4,7 +4,6 @@ const compat = new FlatCompat({
   // import.meta.dirname is available after Node.js v20.11.0
   baseDirectory: import.meta.dirname,
 })
-
 const eslintConfig = [
   ...compat.config({
     extends: [
@@ -64,7 +63,7 @@ const eslintConfig = [
       'simple-import-sort/imports': 'error', // Enforce sorted imports
       'simple-import-sort/exports': 'error', // Enforce sorted exports
       '@typescript-eslint/no-explicit-any': 'warn',
-      'no-console': 'warn',
+      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }], // Allow console.warn and console.error
       'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',

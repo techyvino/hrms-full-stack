@@ -16,8 +16,6 @@ export const TextAreaForm: FC<TextAreaFormProps> = ({
   name = '',
   label = '',
   isRequired = false,
-  required,
-  className,
   ...rest
 }) => {
   const { control, formState, getFieldState } = useFormContext()

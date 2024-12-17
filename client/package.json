@@ -10,8 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "android": "next build && npx cap sync && npx cap open android",
-    "format": "next lint && prettier 'src/**/*.{js,ts,tsx,json,yaml}' --write --ignore-path .gitignore",
-    "format:fix": "next lint --fix && prettier  'src/**/*.{js,ts,tsx,json,yaml}' --write --ignore-path .gitignore"
+    "format": "next lint && prettier './**/*.{js,ts,tsx}' --write --ignore-path .gitignore",
+    "format:fix": "next lint --fix && prettier  './**/*.{js,ts,tsx}' --write --ignore-path .gitignore"
   },
   "dependencies": {
     "@capacitor-community/background-geolocation": "^1.2.19",

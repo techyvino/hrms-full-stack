@@ -5,6 +5,16 @@ interface DateObject {
   holidayReason: string | null
 }
 
+export function getHolidays(year: number, month: number) {
+  // This is a sample list of holidays. You would need to replace this with your own list of holidays.
+  const holidays = [
+    { date: '2024-12-25', reason: 'Christmas Day' },
+    // Add more holidays here...
+  ]
+
+  return holidays.filter((holiday) => holiday.date.startsWith(`${year}-${month.toString().padStart(2, '0')}`))
+}
+
 export function getDatesOfMonth(year: number, month: number): DateObject[] {
   const dates: DateObject[] = []
   const lastDayOfMonth = new Date(year, month, 0)
@@ -37,14 +47,4 @@ export function getDatesOfMonth(year: number, month: number): DateObject[] {
   }
 
   return dates
-}
-
-export function getHolidays(year: number, month: number) {
-  // This is a sample list of holidays. You would need to replace this with your own list of holidays.
-  const holidays = [
-    { date: '2024-12-25', reason: 'Christmas Day' },
-    // Add more holidays here...
-  ]
-
-  return holidays.filter((holiday) => holiday.date.startsWith(`${year}-${month.toString().padStart(2, '0')}`))
 }
