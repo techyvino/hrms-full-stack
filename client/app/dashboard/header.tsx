@@ -1,10 +1,10 @@
+import { Button } from '@nextui-org/react'
+import { LogOut } from 'lucide-react'
 import React from 'react'
 import toast from 'react-hot-toast'
 
 import { authUrl } from '@/lib/urls'
 import api from '@/services/api'
-import { Button } from '@nextui-org/react'
-import { LogOut } from 'lucide-react'
 
 const Header = () => {
   const handleLogout = async () => {
@@ -16,6 +16,7 @@ const Header = () => {
       toast.error('Logout failed')
     }
   }
+
   return (
     <div className="mb-5 flex items-center justify-between border-b">
       <p className="p-4 font-semibold">Dashboard</p>
@@ -32,7 +33,7 @@ const Header = () => {
           </DropdownMenuItem>
           </DropdownMenuContent>
           </DropdownMenu> */}
-      <Button onPress={handleLogout} variant={'light'} className="flex items-center gap-3">
+      <Button className="flex items-center gap-3" variant={'light'} onPress={handleLogout}>
         <LogOut />
         <p>Logout</p>
       </Button>

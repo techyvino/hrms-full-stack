@@ -1,9 +1,10 @@
 'use client'
 
+import type { CheckboxGroupProps as NextUICheckBoxGroup } from '@nextui-org/react'
+import { Checkbox, CheckboxGroup } from '@nextui-org/react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
-import { Checkbox, CheckboxGroup, CheckboxGroupProps as NextUICheckBoxGroup } from '@nextui-org/react'
 
 export interface CheckBoxGroupProps extends NextUICheckBoxGroup {
   name: string
@@ -31,24 +32,24 @@ export const CheckboxGroupForm = ({
   return (
     <div className={cn(containerClassName)}>
       <Controller
-        name={name}
         key={name}
         control={control}
+        name={name}
         render={({ field: { value: checkBoxValue, onChange, ...restField } }) => {
           return (
             <CheckboxGroup
+              classNames={{
+                wrapper: 'gap-4',
+              }}
+              errorMessage={error?.message?.toString()}
+              isInvalid={!!error?.message}
+              isRequired={!!isRequired}
               label={label}
+              validationBehavior="native"
               value={checkBoxValue}
               onValueChange={(val) => {
                 onChange(val)
               }}
-              classNames={{
-                wrapper: 'gap-4',
-              }}
-              isRequired={!!isRequired}
-              isInvalid={!!error?.message}
-              errorMessage={error?.message?.toString()}
-              validationBehavior="native"
               {...restField}
               {...rest}
             >

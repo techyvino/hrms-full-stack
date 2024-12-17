@@ -2,20 +2,20 @@
 
 import { Capacitor } from '@capacitor/core'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Button, Card, CardBody, CardHeader, Form } from '@nextui-org/react'
 import { setCookie } from 'cookies-next/client'
 import { Key, UserRound } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+import type { LoginResponse, LoginSchema } from '@/app/auth/login/schemas'
+import { loginSchema } from '@/app/auth/login/schemas'
 import { InputForm } from '@/components/form/InputForm'
-
 import { useSubmit } from '@/hooks/useSubmit'
 import { getDeviceInfo } from '@/lib/device'
 import { formateLocationInfo, getAddressFromCoordinates, getCurrentLocation } from '@/lib/geolocation'
 import { authUrl } from '@/lib/urls'
-import { LoginResponse, loginSchema, LoginSchema } from '@/app/auth/login/schemas'
-import { Button, Card, CardBody, CardHeader, Form } from '@nextui-org/react'
 
 export default function LoginForm() {
   const { push } = useRouter()
@@ -39,6 +39,7 @@ export default function LoginForm() {
           res?.data?.access_token,
           process.env.NODE_ENV !== 'production' ? {} : { httpOnly: true, secure: true, sameSite: 'strict' }
         )
+
         return push('/dashboard')
       }
     },
@@ -72,11 +73,13 @@ export default function LoginForm() {
         area: formattedLocation?.area,
         postal_code: formattedLocation?.postal_code,
       }
+
       return submit({
         url: authUrl.login,
         data: bodyData,
       })
     }
+
     return submit({
       url: authUrl.login,
       data,
@@ -84,8 +87,8 @@ export default function LoginForm() {
   })
 
   return (
-    <section className="z-10 h-full w-full flex flex-col md:items-center justify-center">
-      <Card className="my-40 flex h-full flex-col border-none bg-transparent shadow-none mx-12">
+    <section className="z-10 flex size-full flex-col justify-center md:items-center">
+      <Card className="mx-12 my-40 flex h-full flex-col border-none bg-transparent shadow-none">
         <CardHeader className="flex-col items-start gap-1">
           <div className="text-4xl font-bold md:text-center">Sign in</div>
           <div className="text-sm text-gray-400">Please fill the credentials</div>
@@ -95,16 +98,16 @@ export default function LoginForm() {
             <Form onSubmit={onSubmit}>
               <InputForm
                 name="username"
-                startContent={<UserRound className="stroke-gray-400" />}
                 placeholder="Username"
+                startContent={<UserRound className="stroke-gray-400" />}
               />
               <InputForm
                 name="password"
-                type="password"
-                startContent={<Key className="stroke-gray-400" />}
                 placeholder="Password"
+                startContent={<Key className="stroke-gray-400" />}
+                type="password"
               />
-              <Button color="primary" variant="solid" isLoading={isLoading} type="submit" className="mt-4 w-full">
+              <Button className="mt-4 w-full" color="primary" isLoading={isLoading} type="submit" variant="solid">
                 Login
               </Button>
             </Form>

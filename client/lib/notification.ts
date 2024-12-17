@@ -6,5 +6,6 @@ export const getNotificationPermission = async () => {
 
 export const checkNotificationPermission = async () => {
   const status = await LocalNotifications.checkPermissions()
+
   return status?.display
 }

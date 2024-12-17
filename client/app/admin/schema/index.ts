@@ -1,5 +1,6 @@
-import { responseSchema } from '@/services/zod'
 import { z } from 'zod'
+
+import { responseSchema } from '@/services/zod'
 
 export const UserSchema = z.object({
   id: z.number(),

@@ -1,9 +1,9 @@
+import { Card, CardBody, CardHeader } from '@nextui-org/react'
 import { History } from 'lucide-react'
 
 import type { ClockEntry } from '@/app/dashboard/schemas'
 import { calculateDuration, formatDate, formatTime } from '@/lib/timeUtils'
 import { cn } from '@/lib/utils'
-import { Card, CardBody, CardHeader } from '@nextui-org/react'
 
 export const TimeHistory = ({ entries }: { entries: ClockEntry[] }) => {
   // const distanceInMins = (clock_in_time: string) =>

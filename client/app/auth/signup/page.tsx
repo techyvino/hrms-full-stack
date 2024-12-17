@@ -37,7 +37,7 @@ const SignUpForm = () => {
               <EmpForm />
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">
+              <Button className="w-full" type="submit">
                 Submit
               </Button>
             </CardFooter>

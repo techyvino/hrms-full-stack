@@ -1,8 +1,9 @@
 'use client'
+import type { CheckboxProps as NextUICheckboxProps } from '@nextui-org/react'
+import { Checkbox } from '@nextui-org/react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
-import { Checkbox, CheckboxProps as NextUICheckboxProps } from '@nextui-org/react'
 
 export interface CheckBoxProps extends NextUICheckboxProps {
   name: string
@@ -13,11 +14,12 @@ export interface CheckBoxProps extends NextUICheckboxProps {
 
 export const CheckboxForm = ({ containerClassName, name, label, ...rest }: CheckBoxProps) => {
   const { control } = useFormContext()
+
   return (
     <div className={cn(containerClassName)}>
       <Controller
-        name={name}
         control={control}
+        name={name}
         render={({ field: { value, onChange, ...restField } }) => {
           return (
             <Checkbox isSelected={value} onValueChange={onChange} {...restField} {...rest}>

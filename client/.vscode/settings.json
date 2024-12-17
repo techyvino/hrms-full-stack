@@ -37,5 +37,6 @@
   "eslint.enable": true,
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.format.enable": true,
-  "eslint.nodePath": "./node_modules/eslint"
+  "eslint.nodePath": "./node_modules/eslint",
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }

@@ -1,10 +1,11 @@
 'use client'
 
+import type { RadioGroupProps, RadioProps } from '@nextui-org/react'
+import { Radio, RadioGroup } from '@nextui-org/react'
 import type { FC } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
-import { Radio, RadioGroup, RadioGroupProps, RadioProps } from '@nextui-org/react'
 
 export interface FormRadioGroupProps extends RadioGroupProps {
   name: string
@@ -31,20 +32,20 @@ export const RadioGroupForm: FC<FormRadioGroupProps> = ({
   return (
     <div className={cn(containerClassName)}>
       <Controller
-        name={name}
         key={name}
         control={control}
+        name={name}
         render={({ field: { value: checkBoxValue, onChange, ...restField } }) => {
           return (
             <RadioGroup
+              errorMessage={error?.message?.toString() || ''}
+              isInvalid={!!error?.message?.toString() || undefined}
               orientation="horizontal"
-              value={checkBoxValue}
               validationBehavior="native"
+              value={checkBoxValue}
               onValueChange={(e) => {
                 onChange(e)
               }}
-              errorMessage={error?.message?.toString() || ''}
-              isInvalid={!!error?.message?.toString() || undefined}
               {...restField}
               {...rest}
             >

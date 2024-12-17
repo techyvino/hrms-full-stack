@@ -36,7 +36,7 @@ const TimeTracking = ({ handlePunchClock, data, isLoading, isSubmitting }: TimeT
       </CardHeader>
       <CardBody>
         <div className="my-5 flex justify-center gap-4">
-          <Button color="primary" variant="shadow" isLoading={isSubmitting} className="w-36" onPress={handlePunchClock}>
+          <Button className="w-36" color="primary" isLoading={isSubmitting} variant="shadow" onPress={handlePunchClock}>
             <LogIn />
             {data?.next_clock_action === 'in' ? 'Clock In' : 'Clock Out'}
           </Button>

@@ -1,9 +1,10 @@
 'use client'
 
+import type { SelectItemProps, SelectProps } from '@nextui-org/react'
+import { Select, SelectItem } from '@nextui-org/react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
-import { Select, SelectItem, SelectItemProps, SelectProps } from '@nextui-org/react'
 
 export interface SelectFormProps extends SelectProps {
   name: string
@@ -42,32 +43,33 @@ export const SelectForm = ({
   return (
     <div className={cn(containerClassName)}>
       <Controller
+        key={name}
         control={control}
         name={name}
-        key={name}
         render={({ field: { value: selectedKey, onChange, ...restField } }) => {
           return (
             <Select
-              label={label || ''}
-              aria-labelledby="select"
+              key={`select_${name}`}
               aria-label="select-input"
-              isLoading={isLoading}
-              isDisabled={isDisabled}
+              aria-labelledby="select"
               color={error?.message ? 'danger' : 'default'}
-              selectionMode={isMultiple ? 'multiple' : 'single'}
-              isRequired={!!isRequired}
+              description={description || ''}
               errorMessage={error?.message?.toString() || ''}
+              isDisabled={isDisabled}
               isInvalid={!!error?.message?.toString() || undefined}
+              isLoading={isLoading}
+              isRequired={!!isRequired}
+              items={options || []}
+              label={label || ''}
+              required={isRequired}
               selectedKeys={isMultiple ? selectedKey : selectedKey ? [selectedKey] : []}
+              selectionMode={isMultiple ? 'multiple' : 'single'}
               onSelectionChange={(val) => {
                 // For Single Selection
                 const singleSelectVal = [...val][0] || ''
+
                 isMultiple ? onChange([...val]) : onChange(singleSelectVal)
               }}
-              description={description || ''}
-              key={`select_${name}`}
-              items={options || []}
-              required={isRequired}
               {...restField}
               {...rest}
             >
@@ -75,8 +77,8 @@ export const SelectForm = ({
                 <SelectItem
                   {...selectItemProps}
                   key={option?.[valueKey]}
-                  value={option?.[valueKey]}
                   textValue={option?.[displayNameKey] || ''}
+                  value={option?.[valueKey]}
                 >
                   {option?.[displayNameKey] || noLabelText}
                 </SelectItem>

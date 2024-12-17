@@ -1,12 +1,12 @@
 'use client'
 
 import { Card, CardBody } from '@nextui-org/react'
-import { CalendarCheck, CalendarX2 } from 'lucide-react'
 import { useCallback, useEffect } from 'react'
 
 import { TimeHistory } from '@/app/dashboard/components/time-history'
 import TimeTracking from '@/app/dashboard/components/time-tracking'
 import type { ClockedStatus } from '@/app/dashboard/schemas'
+import { AttendanceIcon, LeaveIcon } from '@/components/icons'
 import { useAccount } from '@/hooks/useAccount'
 import { useFetch } from '@/hooks/useFetch'
 import { useSubmit } from '@/hooks/useSubmit'
@@ -32,6 +32,7 @@ export default function Home() {
   const getCurrentAddress = useCallback(async () => {
     const position = await getCurrentLocation()
     const address = await getAddressFromCoordinates(position?.coords?.latitude, position?.coords.longitude)
+
     if (address && position) {
       const formattedLocation: LocationInfo = formateLocationInfo({
         address,
@@ -71,6 +72,7 @@ export default function Home() {
       user_id,
       clock_action: response?.data?.next_clock_action,
     }
+
     submit({
       url: activityUrl.punchClock,
       data: bodyData,
@@ -86,21 +88,21 @@ export default function Home() {
       <div className="m-5 flex justify-between gap-5">
         <Card className="flex h-20 w-1/2 items-center justify-center">
           <CardBody className="flex items-center gap-2 font-bold">
-            <CalendarCheck />
+            <AttendanceIcon />
             View Attendance
           </CardBody>
         </Card>
         <Card className="flex h-20 w-1/2 items-center justify-center">
           <CardBody className="flex items-center gap-2 font-bold">
-            <CalendarX2 />
+            <LeaveIcon size={90} />
             Request Time Off
           </CardBody>
         </Card>
       </div>
       <div className="mx-5 space-y-5">
         <TimeTracking
-          handlePunchClock={handlePunchClock}
           data={response?.data}
+          handlePunchClock={handlePunchClock}
           isLoading={isLoading}
           isSubmitting={isSubmitting}
         />

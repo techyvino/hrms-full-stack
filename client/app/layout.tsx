@@ -1,16 +1,15 @@
 import '@/styles/globals.css'
-import clsx from 'clsx'
-import { Metadata, Viewport } from 'next'
 
-import { Providers } from './providers'
+import clsx from 'clsx'
+import type { Metadata, Viewport } from 'next'
+import { Toaster } from 'react-hot-toast'
 
 import AuthWrapper from '@/app/auth-wrapper'
-import NoSsrWrapper from '@/app/no-ssr-wrapper'
-import PullToPageRefresh from '@/app/pull-to-refresh'
+import { Navbar } from '@/components/navbar'
 import { fontSans } from '@/config/fonts'
 import { siteConfig } from '@/config/site'
-import { Toaster } from 'react-hot-toast'
-import { Navbar } from '@/components/navbar'
+
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: {
@@ -36,20 +35,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head />
       <body className={clsx('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
         <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
-          <NoSsrWrapper>
-            <>
-              <Navbar />
-              <PullToPageRefresh />
-              <AuthWrapper>{children}</AuthWrapper>
-              <Toaster
-                toastOptions={{
-                  style: {
-                    borderRadius: '99px',
-                  },
-                }}
-              />
-            </>
-          </NoSsrWrapper>
+          <>
+            <Navbar />
+            <AuthWrapper>{children}</AuthWrapper>
+            <Toaster
+              toastOptions={{
+                style: {
+                  borderRadius: '99px',
+                },
+              }}
+            />
+          </>
         </Providers>
       </body>
     </html>

@@ -59,6 +59,7 @@ export default function EmployeeForm() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
+
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
@@ -85,27 +86,27 @@ export default function EmployeeForm() {
           <div className="">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" value={formData.name} onChange={handleInputChange} required />
+              <Input required id="name" name="name" value={formData.name} onChange={handleInputChange} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
+                required
+                classNames={{
+                  iconWrapper: 'text-gray-500 text-lg',
+                }}
+                icon={<EyeClosed />}
+                iconPosition="left"
                 id="password"
                 name="password"
                 type="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                icon={<EyeClosed />}
-                classNames={{
-                  iconWrapper: 'text-gray-500 text-lg',
-                }}
-                iconPosition="left"
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="dob">Date of Birth</Label>
-              <Input id="dob" name="dob" type="date" value={formData.dob} onChange={handleInputChange} required />
+              <Input required id="dob" name="dob" type="date" value={formData.dob} onChange={handleInputChange} />
             </div>
             <div className="space-y-2">
               <Label>Gender</Label>
@@ -114,15 +115,15 @@ export default function EmployeeForm() {
                 onValueChange={(value) => setFormData((prev) => ({ ...prev, gender: value }))}
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Male" id="male" />
+                  <RadioGroupItem id="male" value="Male" />
                   <Label htmlFor="male">Male</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Female" id="female" />
+                  <RadioGroupItem id="female" value="Female" />
                   <Label htmlFor="female">Female</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Other" id="other" />
+                  <RadioGroupItem id="other" value="Other" />
                   <Label htmlFor="other">Other</Label>
                 </div>
               </RadioGroup>
@@ -148,8 +149,8 @@ export default function EmployeeForm() {
             <div className="space-y-2">
               <Label htmlFor="is_a_manager">Is a Manager</Label>
               <Switch
-                id="is_a_manager"
                 checked={formData.is_a_manager}
+                id="is_a_manager"
                 onCheckedChange={handleSwitchChange('is_a_manager')}
               />
             </div>
@@ -186,54 +187,54 @@ export default function EmployeeForm() {
             <div className="space-y-2">
               <Label htmlFor="joined_date">Joined Date</Label>
               <Input
+                required
                 id="joined_date"
                 name="joined_date"
                 type="date"
                 value={formData.joined_date}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="department">Department</Label>
               <Input
+                required
                 id="department"
                 name="department"
                 value={formData.department}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="designation">Designation</Label>
               <Input
+                required
                 id="designation"
                 name="designation"
                 value={formData.designation}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="site_id">Site ID</Label>
               <Input
+                required
                 id="site_id"
                 name="site_id"
                 type="number"
                 value={formData.site_id}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="role_id">Role ID</Label>
               <Input
+                required
                 id="role_id"
                 name="role_id"
                 type="number"
                 value={formData.role_id}
                 onChange={handleInputChange}
-                required
               />
             </div>
           </div>
@@ -245,37 +246,37 @@ export default function EmployeeForm() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="mobile_no">Mobile Number</Label>
-              <Input id="mobile_no" name="mobile_no" value={formData.mobile_no} onChange={handleInputChange} required />
+              <Input required id="mobile_no" name="mobile_no" value={formData.mobile_no} onChange={handleInputChange} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
+                required
                 id="email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="emergency_contact_name">Emergency Contact Name</Label>
               <Input
+                required
                 id="emergency_contact_name"
                 name="emergency_contact_name"
                 value={formData.emergency_contact_name}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="emergency_contact_no">Emergency Contact Number</Label>
               <Input
+                required
                 id="emergency_contact_no"
                 name="emergency_contact_no"
                 value={formData.emergency_contact_no}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
@@ -306,101 +307,101 @@ export default function EmployeeForm() {
             <div className="space-y-2">
               <Label htmlFor="temporary_address">Temporary Address</Label>
               <Textarea
+                required
                 id="temporary_address"
                 name="temporary_address"
                 value={formData.temporary_address}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="permanent_address">Permanent Address</Label>
               <Textarea
+                required
                 id="permanent_address"
                 name="permanent_address"
                 value={formData.permanent_address}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="temporary_city">Temporary City</Label>
               <Input
+                required
                 id="temporary_city"
                 name="temporary_city"
                 value={formData.temporary_city}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="permanent_city">Permanent City</Label>
               <Input
+                required
                 id="permanent_city"
                 name="permanent_city"
                 value={formData.permanent_city}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="temporary_state">Temporary State</Label>
               <Input
+                required
                 id="temporary_state"
                 name="temporary_state"
                 value={formData.temporary_state}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="permanent_state">Permanent State</Label>
               <Input
+                required
                 id="permanent_state"
                 name="permanent_state"
                 value={formData.permanent_state}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="temporary_country">Temporary Country</Label>
               <Input
+                required
                 id="temporary_country"
                 name="temporary_country"
                 value={formData.temporary_country}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="permanent_country">Permanent Country</Label>
               <Input
+                required
                 id="permanent_country"
                 name="permanent_country"
                 value={formData.permanent_country}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="temporary_postal_code">Temporary Postal Code</Label>
               <Input
+                required
                 id="temporary_postal_code"
                 name="temporary_postal_code"
                 value={formData.temporary_postal_code}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="permanent_postal_code">Permanent Postal Code</Label>
               <Input
+                required
                 id="permanent_postal_code"
                 name="permanent_postal_code"
                 value={formData.permanent_postal_code}
                 onChange={handleInputChange}
-                required
               />
             </div>
           </div>
@@ -426,21 +427,21 @@ export default function EmployeeForm() {
             <div className="space-y-2">
               <Label htmlFor="identification_type">Identification Type</Label>
               <Input
+                required
                 id="identification_type"
                 name="identification_type"
                 value={formData.identification_type}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="identification_number">Identification Number</Label>
               <Input
+                required
                 id="identification_number"
                 name="identification_number"
                 value={formData.identification_number}
                 onChange={handleInputChange}
-                required
               />
             </div>
           </div>
@@ -452,56 +453,56 @@ export default function EmployeeForm() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="platform">Platform</Label>
-              <Input id="platform" name="platform" value={formData.platform} onChange={handleInputChange} required />
+              <Input required id="platform" name="platform" value={formData.platform} onChange={handleInputChange} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="operating_system">Operating System</Label>
               <Input
+                required
                 id="operating_system"
                 name="operating_system"
                 value={formData.operating_system}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="os_version">OS Version</Label>
               <Input
+                required
                 id="os_version"
                 name="os_version"
                 value={formData.os_version}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="manufacturer">Manufacturer</Label>
               <Input
+                required
                 id="manufacturer"
                 name="manufacturer"
                 value={formData.manufacturer}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="device_name">Device Name</Label>
               <Input
+                required
                 id="device_name"
                 name="device_name"
                 value={formData.device_name}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="device_model">Device Model</Label>
               <Input
+                required
                 id="device_model"
                 name="device_model"
                 value={formData.device_model}
                 onChange={handleInputChange}
-                required
               />
             </div>
           </div>
@@ -512,8 +513,8 @@ export default function EmployeeForm() {
           <h3 className="text-lg font-semibold">Other Settings</h3>
           <div className="flex items-center space-x-2">
             <Switch
-              id="live_tracker_enabled"
               checked={formData.live_tracker_enabled}
+              id="live_tracker_enabled"
               onCheckedChange={handleSwitchChange('live_tracker_enabled')}
             />
             <Label htmlFor="live_tracker_enabled">Enable Live Tracker</Label>
@@ -521,7 +522,7 @@ export default function EmployeeForm() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button type="submit" className="w-full">
+        <Button className="w-full" type="submit">
           Submit
         </Button>
       </CardFooter>

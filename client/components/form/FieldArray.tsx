@@ -12,6 +12,7 @@ const FieldArray: FC<FieldArrayProps> = ({ fields }) => {
     <>
       {fields.map((field) => {
         const { hide, ...rest } = field
+
         return !hide && <SelectField key={field?.name} {...rest} />
       })}
     </>

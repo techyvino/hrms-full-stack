@@ -29,7 +29,7 @@ const OpenStreetMap: FC<OpenStreetMapProps> = ({ center, positions }) => {
 
   return (
     <div className="mt-24 flex items-center justify-center">
-      <MapContainer center={center} zoom={13} scrollWheelZoom={false} style={{ height: '50vh', width: '50vh' }}>
+      <MapContainer center={center} scrollWheelZoom={false} style={{ height: '50vh', width: '50vh' }} zoom={13}>
         {polyline && <Polyline pathOptions={limeOptions} positions={polyline} />}
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <Marker position={center} />

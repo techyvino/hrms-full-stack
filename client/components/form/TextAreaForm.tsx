@@ -1,8 +1,9 @@
+import type { TextAreaProps } from '@nextui-org/react'
+import { Textarea } from '@nextui-org/react'
 import type { FC } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
-import { Textarea, TextAreaProps } from '@nextui-org/react'
 
 export interface TextAreaFormProps extends TextAreaProps {
   name: string
@@ -26,18 +27,18 @@ export const TextAreaForm: FC<TextAreaFormProps> = ({
   return (
     <div className={cn(containerClassName)}>
       <Controller
-        name={name}
         control={control}
+        name={name}
         render={({ field }) => (
           <Textarea
             fullWidth
-            id={name}
-            label={label}
-            isRequired={isRequired}
-            required={isRequired}
             color={error?.message ? 'danger' : 'default'}
-            isInvalid={!!error?.message}
             errorMessage={error?.message}
+            id={name}
+            isInvalid={!!error?.message}
+            isRequired={isRequired}
+            label={label}
+            required={isRequired}
             {...field}
             {...rest}
           />

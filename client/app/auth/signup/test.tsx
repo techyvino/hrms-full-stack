@@ -62,14 +62,14 @@ export function EmpForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="">
-        <InputForm name="username" label="Username" />
-        <InputForm name="password" label="Password" />
-        <SwitchForm name="is_manager" label="Is Manager" />
-        <RadioGroupForm name="type" label="Notify option" options={notifications} />
-        <CheckboxGroupForm name="items" label="Notify option" options={notifications} />
+      <form className="" onSubmit={form.handleSubmit(onSubmit)}>
+        <InputForm label="Username" name="username" />
+        <InputForm label="Password" name="password" />
+        <SwitchForm label="Is Manager" name="is_manager" />
+        <RadioGroupForm label="Notify option" name="type" options={notifications} />
+        <CheckboxGroupForm label="Notify option" name="items" options={notifications} />
         <MultiTagSelectForm label="Framework" name="framework" options={notifications} />
-        <SelectForm name="select" label="Notify option" options={notifications} />
+        <SelectForm label="Notify option" name="select" options={notifications} />
         <Button className="mt-5 w-full" type="submit">
           Submit
         </Button>

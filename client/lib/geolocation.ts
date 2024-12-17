@@ -43,18 +43,22 @@ export const reqLocationPermission = async () => {
   if (!IsNative) {
     return 'denied'
   }
+
   return await Geolocation.requestPermissions()
 }
 export const getCurrentLocation = async () => {
   if (!IsNative) {
     const position: Position = {} as Position
+
     // Use a Promise to wrap the navigator API
     navigator.geolocation.getCurrentPosition((pos) => {
       position.coords = pos.coords
       position.timestamp = pos.timestamp
     })
+
     return position
   }
+
   return await Geolocation.getCurrentPosition()
 }
 
@@ -87,6 +91,7 @@ export const addLocationWatcher = async (
     )
   } else {
     console.info('This app can only be used in a native environment.')
+
     return ''
   }
 }
@@ -102,8 +107,10 @@ export const getAddressFromCoordinates = async (latitude: number, longitude: num
       longitude,
       defaultLocale: 'en-IN',
     })
+
     return addresses?.[0]
   }
+
   return {} as Address
 }
 

@@ -45,5 +45,6 @@ export function getHolidays(year: number, month: number) {
     { date: '2024-12-25', reason: 'Christmas Day' },
     // Add more holidays here...
   ]
+
   return holidays.filter((holiday) => holiday.date.startsWith(`${year}-${month.toString().padStart(2, '0')}`))
 }
