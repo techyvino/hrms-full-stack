@@ -1,9 +1,9 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -19,7 +19,7 @@ export function DataTable<TData, TValue>({ columns, data }: Readonly<DataTablePr
 
   return (
     <div className="rounded-md border">
-      <Table>
+      {/* <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -50,7 +50,7 @@ export function DataTable<TData, TValue>({ columns, data }: Readonly<DataTablePr
             </TableRow>
           )}
         </TableBody>
-      </Table>
+      </Table> */}
     </div>
   )
 }
