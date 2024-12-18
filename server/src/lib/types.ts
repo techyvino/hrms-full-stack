@@ -8,3 +8,9 @@ export interface AppBindings {
     user: JWTPayloadWithUser
   }
 }
+
+export interface DefaultDbColumns {
+  createdAt: Date
+  updatedAt: Date
+  id: number
+}

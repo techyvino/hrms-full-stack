@@ -48,3 +48,19 @@ export function getDatesOfMonth(year: number, month: number): DateObject[] {
 
   return dates
 }
+
+export function getStartAndEndOfMonth(year: number, month: number): { startDate: Date; endDate: Date } {
+  // Ensure month is 0-based (0 = January, 11 = December)
+  const startDate = new Date(year, month - 1, 1)
+  const endDate = new Date(year, month, 0)
+
+  return { startDate, endDate }
+}
+
+export function getMonthYear(date: Date | null): { month: number; year: number } {
+  const dateObj = date || new Date()
+  const month = dateObj.getMonth() + 1 // Months are 0-based, so we add 1 to get the correct month
+  const year = dateObj.getFullYear()
+
+  return { month, year }
+}

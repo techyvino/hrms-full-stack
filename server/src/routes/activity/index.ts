@@ -18,6 +18,7 @@ import {
   clockedInStatusResponseSchema,
   punchClockRequestSchema,
 } from '@/routes/activity/zod'
+import { paramUserIdSchema, querySchema } from '@/routes/user/zod'
 
 const activityRouter = createRouter()
 const tags = ['Activity']
@@ -84,7 +85,8 @@ activityRouter.post(
       const [lastClockedInInfo] = await getPunchStatusBetweenDates(
         body.user_id,
         startOfDay,
-        endOfDay
+        endOfDay,
+        ['id', 'user_id', 'clock_in', 'clock_out']
       )
 
       if (clock_action === 'in') {
@@ -101,6 +103,31 @@ activityRouter.post(
     } catch (error) {
       respondHandler(c, 'bad_request', dbError(error as NeonDbError))
     }
+  }
+)
+
+activityRouter.get(
+  '/getAttendance/:id',
+  describeRoute({
+    summary: 'Get Attendance Status',
+    description: 'get attendance status by id and start and end date',
+    tags,
+  }),
+  zodValidator('param', paramUserIdSchema),
+  zodValidator('query', querySchema('startDate')),
+  zodValidator('query', querySchema('endDate')),
+  async (c) => {
+    const userId = Number(c.req.param('id'))
+    const startDate = c.req.query('startDate') || ''
+    const endDate = c.req.query('endDate') || ''
+
+    const entries = await getPunchStatusBetweenDates(
+      userId,
+      new Date(startDate),
+      new Date(endDate),
+      ['id', 'user_id', 'clock_in', 'clock_out']
+    )
+    return respondHandler(c, 'success', entries)
   }
 )
 

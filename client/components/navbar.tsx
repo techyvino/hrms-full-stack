@@ -41,7 +41,7 @@ export const Navbar = () => {
   return (
     <>
       <PullToPageRefresh />
-      <NextUINavbar maxWidth="xl" position="sticky">
+      <NextUINavbar shouldHideOnScroll className="mb-4 shadow-md" maxWidth="xl" position="sticky">
         <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
           <NavbarBrand as="li" className="max-w-fit gap-3">
             <NextLink className="flex items-center justify-start gap-1" href="/">

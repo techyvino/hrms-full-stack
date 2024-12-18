@@ -5,14 +5,12 @@ import type { z } from 'zod'
 import { db } from '@/db'
 import { activityLogTable } from '@/db/schemas/activity.schema'
 import { respondHandler } from '@/lib/http-status'
-import { dateTimeNow } from '@/lib/utils'
+import { dateTimeNow, extractKeys } from '@/lib/utils'
 import type { punchClockRequestSchema } from '@/routes/activity/zod'
 
 export interface PunchInfo {
   id: number
   user_id: number
-  createdAt: Date | null
-  updatedAt: Date | null
   clock_in: Date | null
   clock_out: Date | null
 }
@@ -21,6 +19,10 @@ export type PunchBody = Omit<
   z.infer<typeof punchClockRequestSchema>,
   'clock_action'
 >
+
+const tableColumns = getTableColumns(activityLogTable)
+
+type TableColumns = keyof typeof tableColumns
 
 export const getTodayPunchStatus = async (userId: number) => {
   // check if user is already clocked in
@@ -48,20 +50,21 @@ export const getTodayPunchStatus = async (userId: number) => {
 export const getPunchStatusBetweenDates = async (
   userId: number,
   startOfDay: Date,
-  endOfDay: Date
+  endOfDay: Date,
+  columns: TableColumns[] | typeof tableColumns = [
+    'id',
+    'user_id',
+    'clock_in',
+    'clock_out',
+  ]
 ) => {
   // check if user is already clocked in
-  const { id, user_id, createdAt, updatedAt, clock_in, clock_out } =
-    getTableColumns(activityLogTable)
+  const defaultColumns = Array.isArray(columns)
+    ? extractKeys(tableColumns, columns)
+    : columns
+
   return await db
-    .select({
-      id,
-      user_id,
-      createdAt,
-      updatedAt,
-      clock_in,
-      clock_out,
-    })
+    .select(defaultColumns)
     .from(activityLogTable)
     .where(
       and(

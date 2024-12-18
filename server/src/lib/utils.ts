@@ -27,3 +27,19 @@ export const istDateTimeNow = () => {
 export const dateTimeNow = () => {
   return new Date()
 }
+
+export function extractKeys<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+>(data: T, keys?: K[]): Pick<T, K> {
+  const result: Partial<T> = {}
+  if (keys) {
+    for (const key of keys) {
+      if (key in data) {
+        result[key] = data[key]
+      }
+    }
+    return result as Pick<T, K>
+  }
+  return data
+}

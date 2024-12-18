@@ -60,6 +60,13 @@ export const paramUserIdSchema = z.object({
   id: z.string({ message: 'User id is required' }),
 })
 
+export const querySchema = (queryKey = 'id') =>
+  z.object({
+    [queryKey]: z
+      .string({ message: queryKey + ' is required' })
+      .date('Invalid ' + queryKey),
+  })
+
 // GET - Get user details by ID - Response
 export const getUserDetailsResponse = responseSchema
   .omit({ message: true })

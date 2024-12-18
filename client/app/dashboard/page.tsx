@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardBody } from '@nextui-org/react'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
 
 import { TimeHistory } from '@/app/dashboard/components/time-history'
@@ -22,6 +23,7 @@ import { activityUrl } from '@/lib/urls'
 export default function Home() {
   const { response, isLoading, fetcher } = useFetch<ClockedStatus>()
   const { user_id } = useAccount()
+  const { push } = useRouter()
 
   const { submit, isLoading: isSubmitting } = useSubmit({
     onSuccess: () => {
@@ -86,7 +88,7 @@ export default function Home() {
   return (
     <main>
       <div className="m-5 flex justify-between gap-5">
-        <Card className="flex h-20 w-1/2 items-center justify-center">
+        <Card isPressable className="flex h-20 w-1/2 items-center justify-center" onPress={() => push('/attendance')}>
           <CardBody className="flex items-center gap-2 font-bold">
             <AttendanceIcon />
             View Attendance
