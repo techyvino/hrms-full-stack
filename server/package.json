@@ -3,8 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build src/index.ts --outdir=dist",
-    "start": "bun run dist/index.js",
+    "start": "bun run src/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -28,7 +27,6 @@
     "i": "^0.3.7",
     "npm": "^10.9.2",
     "pino": "^9.5.0",
-    "pino-pretty": "^13.0.0",
     "tsc-alias": "^1.8.10",
     "zod": "^3.24.1",
     "zod-openapi": "^4.1.0"
