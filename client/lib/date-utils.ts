@@ -1,3 +1,15 @@
+import {
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  format,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+} from 'date-fns'
+
 interface DateObject {
   day: string
   date: string
@@ -49,12 +61,29 @@ export function getDatesOfMonth(year: number, month: number): DateObject[] {
   return dates
 }
 
-export function getStartAndEndOfMonth(year: number, month: number): { startDate: Date; endDate: Date } {
-  // Ensure month is 0-based (0 = January, 11 = December)
-  const startDate = new Date(year, month - 1, 1)
-  const endDate = new Date(year, month, 0)
+export function getStartAndEndOfMonth(date: Date) {
+  const startDateDay = format(startOfDay(date), 'yyyy-MM-dd')
+  const endDateDay = format(endOfDay(date), 'yyyy-MM-dd')
 
-  return { startDate, endDate }
+  const startDateWeek = format(startOfWeek(date), 'yyyy-MM-dd')
+  const endDateWeek = format(endOfWeek(date), 'yyyy-MM-dd')
+
+  const startDateMonth = format(startOfMonth(date), 'yyyy-MM-dd')
+  const endDateMonth = format(endOfMonth(date), 'yyyy-MM-dd')
+
+  const startDateYear = format(startOfYear(date), 'yyyy-MM-dd')
+  const endDateYear = format(endOfYear(date), 'yyyy-MM-dd')
+
+  return {
+    startDateDay,
+    endDateDay,
+    startDateWeek,
+    endDateWeek,
+    startDateMonth,
+    endDateMonth,
+    startDateYear,
+    endDateYear,
+  }
 }
 
 export function getMonthYear(date: Date | null): { month: number; year: number } {

@@ -4,12 +4,12 @@ import clsx from 'clsx'
 import type { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
 
-import AuthWrapper from '@/app/auth-wrapper'
 import { Navbar } from '@/components/navbar'
+import { AuthWrapper } from '@/components/wrappers/auth-wrapper'
+import { NoSSRWrapper } from '@/components/wrappers/no-ssr'
+import { Providers } from '@/components/wrappers/providers'
 import { fontSans } from '@/config/fonts'
 import { siteConfig } from '@/config/site'
-
-import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: {
@@ -35,7 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head />
       <body className={clsx('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
         <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
-          <>
+          <NoSSRWrapper>
             <Navbar />
             <AuthWrapper>{children}</AuthWrapper>
             <Toaster
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 },
               }}
             />
-          </>
+          </NoSSRWrapper>
         </Providers>
       </body>
     </html>

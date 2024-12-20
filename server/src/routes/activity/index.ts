@@ -8,6 +8,7 @@ import { activityLogTable } from '@/db/schemas/activity.schema'
 import { createRouter } from '@/lib/create-app'
 import { dbError } from '@/lib/error-handling'
 import { respondHandler } from '@/lib/http-status'
+import { calculateMinutes } from '@/lib/time-utils'
 import { dateTimeNow } from '@/lib/utils'
 import { zodValidator } from '@/middleware/zod-validator'
 import {
@@ -108,7 +109,7 @@ activityRouter.post(
 )
 
 activityRouter.get(
-  '/getAttendance/:id',
+  '/attendance/:id',
   describeRoute({
     summary: 'Get Attendance Status',
     description: 'get attendance status by id and start and end date',
@@ -126,10 +127,40 @@ activityRouter.get(
       new Date(startDate),
       new Date(endDate),
       {
-        clock_in_date: sql<Date>`date_trunc('day', ${activityLogTable.clock_in})`,
+        clockedDates: sql<string>`date_trunc('day', ${activityLogTable.clock_in})::date`,
       }
     )
-    return respondHandler(c, 'success', entries[0])
+
+    const uniqueEntries = [
+      ...new Set(entries.map((entry) => entry.clockedDates)),
+    ]
+
+    const entriesByDate = uniqueEntries?.map((date) => {
+      return {
+        date,
+        entries: entries
+          ?.filter((punch) => punch?.clockedDates?.includes(date))
+          ?.map((punch) => ({
+            id: punch?.id,
+            clockIn: punch?.clock_in,
+            clockOut: punch?.clock_out,
+            durationInMinutes: calculateMinutes(
+              punch?.clock_out,
+              punch?.clock_in
+            ),
+          })),
+      }
+    })
+
+    const entriesWithDuration = entriesByDate.map((date) => ({
+      ...date,
+      totalDurationInMinutes: date.entries.reduce(
+        (acc, cur) => acc + cur?.durationInMinutes,
+        0
+      ),
+    }))
+
+    return respondHandler(c, 'success', entriesWithDuration)
   }
 )
 

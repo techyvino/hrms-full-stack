@@ -2,18 +2,17 @@
 import { Code, Link, Snippet } from '@nextui-org/react'
 import { button as buttonStyles } from '@nextui-org/theme'
 
-import { subtitle, title } from '@/components/primitives'
 import { siteConfig } from '@/config/site'
 
 export default function Home() {
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
       <div className="inline-block max-w-xl justify-center text-center">
-        <span className={title()}>Make&nbsp;</span>
-        <span className={title({ color: 'violet' })}>beautiful&nbsp;</span>
+        <span>Make&nbsp;</span>
+        <span>beautiful&nbsp;</span>
         <br />
-        <span className={title()}>websites regardless of your design experience.</span>
-        <div className={subtitle({ class: 'mt-4' })}>Beautiful, fast and modern React UI library.</div>
+        <span>websites regardless of your design experience.</span>
+        <div>Beautiful, fast and modern React UI library.</div>
       </div>
 
       <div className="flex gap-3">

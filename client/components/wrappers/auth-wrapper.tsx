@@ -6,7 +6,7 @@ import React, { useEffect } from 'react'
 
 type WrapperComponent = FC<{ children: ReactNode }>
 
-const AuthWrapper: WrapperComponent = ({ children }) => {
+export const AuthWrapper: WrapperComponent = ({ children }) => {
   const token = getCookie('access_token')
   const path = usePathname()
 
@@ -21,5 +21,3 @@ const AuthWrapper: WrapperComponent = ({ children }) => {
 
   return <div>{children}</div>
 }
-
-export default AuthWrapper

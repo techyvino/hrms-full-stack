@@ -12,7 +12,6 @@ import type { punchClockRequestSchema } from '@/routes/activity/zod'
 
 export interface PunchInfo {
   id: number
-  user_id: number
   clock_in: Date | null
   clock_out: Date | null
 }
@@ -56,7 +55,6 @@ export const getPunchStatusBetweenDates = async <
   const defaultFields = {
     ...columns,
     id: activityLogTable.id,
-    user_id: activityLogTable.user_id,
     clock_in: activityLogTable.clock_in,
     clock_out: activityLogTable.clock_out,
   }
