@@ -12,7 +12,7 @@ export function pinoLogger() {
         // level: env.LOG_LEVEL || 'silent',
         level: 'silent',
       },
-      env.NODE_ENV === 'production' ? undefined : pretty()
+      env.ENVIRONMENt === 'production' ? undefined : pretty()
     ),
     http: {
       reqId: () => getRandomString(),
