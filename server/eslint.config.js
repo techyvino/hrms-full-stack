@@ -32,6 +32,7 @@ export default [
       'import-x/order': 'off',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-use-before-define': 'warn',
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   }, // tslint-recommended
   {

@@ -1,11 +1,13 @@
+import type { SQL } from 'drizzle-orm'
 import { and, desc, eq, getTableColumns, gte, lte, sql } from 'drizzle-orm'
+import type { PgColumn } from 'drizzle-orm/pg-core'
 import type { Context } from 'hono'
 import type { z } from 'zod'
 
 import { db } from '@/db'
 import { activityLogTable } from '@/db/schemas/activity.schema'
 import { respondHandler } from '@/lib/http-status'
-import { dateTimeNow, extractKeys } from '@/lib/utils'
+import { dateTimeNow } from '@/lib/utils'
 import type { punchClockRequestSchema } from '@/routes/activity/zod'
 
 export interface PunchInfo {
@@ -19,10 +21,6 @@ export type PunchBody = Omit<
   z.infer<typeof punchClockRequestSchema>,
   'clock_action'
 >
-
-const tableColumns = getTableColumns(activityLogTable)
-
-type TableColumns = keyof typeof tableColumns
 
 export const getTodayPunchStatus = async (userId: number) => {
   // check if user is already clocked in
@@ -47,33 +45,50 @@ export const getTodayPunchStatus = async (userId: number) => {
     .orderBy(desc(activityLogTable.updatedAt))
 }
 
-export const getPunchStatusBetweenDates = async (
+export const getPunchStatusBetweenDates = async <
+  TColumns extends Record<string, PgColumn | SQL | SQL.Aliased>,
+>(
   userId: number,
   startOfDay: Date,
   endOfDay: Date,
-  columns: TableColumns[] | typeof tableColumns = [
-    'id',
-    'user_id',
-    'clock_in',
-    'clock_out',
-  ]
+  columns: TColumns = {} as TColumns
 ) => {
-  // check if user is already clocked in
-  const defaultColumns = Array.isArray(columns)
-    ? extractKeys(tableColumns, columns)
-    : columns
+  const defaultFields = {
+    ...columns,
+    id: activityLogTable.id,
+    user_id: activityLogTable.user_id,
+    clock_in: activityLogTable.clock_in,
+    clock_out: activityLogTable.clock_out,
+  }
 
-  return await db
-    .select(defaultColumns)
+  type ResultType = {
+    [K in keyof typeof defaultFields]: (typeof defaultFields)[K] extends PgColumn<
+      infer TConfig
+    >
+      ? TConfig['data']
+      : (typeof defaultFields)[K] extends SQL<infer TSQL>
+        ? TSQL
+        : (typeof defaultFields)[K] extends SQL.Aliased<infer TAliased>
+          ? TAliased
+          : string
+  }
+
+  const result = await db
+    .select(defaultFields)
     .from(activityLogTable)
     .where(
       and(
         eq(activityLogTable.user_id, userId),
-        gte(activityLogTable.clock_in, startOfDay),
-        lte(activityLogTable.clock_in, endOfDay)
+        gte(activityLogTable.createdAt, startOfDay),
+        lte(
+          activityLogTable.createdAt,
+          new Date(endOfDay.setHours(23, 59, 59, 999))
+        )
       )
     )
     .orderBy(desc(activityLogTable.updatedAt))
+
+  return result as ResultType[]
 }
 
 export const handleClockIn = async (

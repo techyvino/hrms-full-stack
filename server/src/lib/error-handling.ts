@@ -16,7 +16,7 @@ export const dbError = (error: NeonDbError) => {
       'The database does not exist. Please ensure you are connecting to the correct database.',
     // Add more error codes and messages as needed
   }
-  const isProduction = env.ENVIRONMENt === 'production'
+  const isProduction = env.ENV === 'production'
 
   return {
     message: error?.code

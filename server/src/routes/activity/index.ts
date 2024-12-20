@@ -1,8 +1,10 @@
 import type { NeonDbError } from '@neondatabase/serverless'
+import { sql } from 'drizzle-orm'
 import { describeRoute } from 'hono-openapi'
 import { resolver } from 'hono-openapi/zod'
 import type { z } from 'zod'
 
+import { activityLogTable } from '@/db/schemas/activity.schema'
 import { createRouter } from '@/lib/create-app'
 import { dbError } from '@/lib/error-handling'
 import { respondHandler } from '@/lib/http-status'
@@ -85,8 +87,7 @@ activityRouter.post(
       const [lastClockedInInfo] = await getPunchStatusBetweenDates(
         body.user_id,
         startOfDay,
-        endOfDay,
-        ['id', 'user_id', 'clock_in', 'clock_out']
+        endOfDay
       )
 
       if (clock_action === 'in') {
@@ -124,9 +125,11 @@ activityRouter.get(
       userId,
       new Date(startDate),
       new Date(endDate),
-      ['id', 'user_id', 'clock_in', 'clock_out']
+      {
+        clock_in_date: sql<Date>`date_trunc('day', ${activityLogTable.clock_in})`,
+      }
     )
-    return respondHandler(c, 'success', entries)
+    return respondHandler(c, 'success', entries[0])
   }
 )
 

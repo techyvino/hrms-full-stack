@@ -27,19 +27,16 @@ export const istDateTimeNow = () => {
 export const dateTimeNow = () => {
   return new Date()
 }
-
-export function extractKeys<
-  T extends Record<string, unknown>,
-  K extends keyof T,
->(data: T, keys?: K[]): Pick<T, K> {
-  const result: Partial<T> = {}
-  if (keys) {
-    for (const key of keys) {
-      if (key in data) {
-        result[key] = data[key]
-      }
-    }
-    return result as Pick<T, K>
-  }
-  return data
+type TableColumnKey<T> = keyof T
+export function extractTableColumns<T>(
+  table: T,
+  columns: TableColumnKey<T>[]
+): Pick<T, TableColumnKey<T>> {
+  return columns?.reduce(
+    (acc, column) => {
+      acc[column] = table[column]
+      return acc
+    },
+    {} as Pick<T, TableColumnKey<T>>
+  )
 }
