@@ -18,7 +18,7 @@ import { responseSchema } from '@/routes/auth/zod'
 import {
   getUserDetailsResponse,
   getUserListResponse,
-  paramUserIdSchema,
+  userIdParamSchema,
   signUpValuesSchema,
   updateUserValuesSchema,
 } from '@/routes/user/zod'
@@ -136,7 +136,7 @@ userRouter.get(
       },
     },
   }),
-  zodValidator('param', paramUserIdSchema),
+  zodValidator('param', userIdParamSchema),
   async (c) => {
     const userId = Number(c.req.param('id'))
 

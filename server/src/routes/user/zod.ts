@@ -56,16 +56,16 @@ export const updateUserValuesSchema = signUpValuesSchema
   })
 
 // GET - Get user details by ID - Request
-export const paramUserIdSchema = z.object({
+export const userIdParamSchema = z.object({
   id: z.string({ message: 'User id is required' }),
 })
 
-export const querySchema = (queryKey = 'id') =>
-  z.object({
-    [queryKey]: z
-      .string({ message: queryKey + ' is required' })
-      .date('Invalid ' + queryKey),
-  })
+export const startEndDateQuerySchema = z.object({
+  startDate: z
+    .string({ message: 'startDate is required' })
+    .date('Invalid startDate'),
+  endDate: z.string({ message: 'endDate is required' }).date('Invalid endDate'),
+})
 
 // GET - Get user details by ID - Response
 export const getUserDetailsResponse = responseSchema

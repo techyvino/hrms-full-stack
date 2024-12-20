@@ -9,6 +9,7 @@ import notFound from '@/lib/not-found'
 import serveEmojiFavicon from '@/lib/serve-emoji-favicon'
 import type { AppBindings } from '@/lib/types'
 import { pinoLogger } from '@/middleware/logger'
+
 export const createRouter = () => {
   return new Hono<AppBindings>({
     strict: false,

@@ -18,7 +18,7 @@ import {
   clockedInStatusResponseSchema,
   punchClockRequestSchema,
 } from '@/routes/activity/zod'
-import { paramUserIdSchema, querySchema } from '@/routes/user/zod'
+import { startEndDateQuerySchema, userIdParamSchema } from '@/routes/user/zod'
 
 const activityRouter = createRouter()
 const tags = ['Activity']
@@ -113,9 +113,8 @@ activityRouter.get(
     description: 'get attendance status by id and start and end date',
     tags,
   }),
-  zodValidator('param', paramUserIdSchema),
-  zodValidator('query', querySchema('startDate')),
-  zodValidator('query', querySchema('endDate')),
+  zodValidator('param', userIdParamSchema),
+  zodValidator('query', startEndDateQuerySchema),
   async (c) => {
     const userId = Number(c.req.param('id'))
     const startDate = c.req.query('startDate') || ''
