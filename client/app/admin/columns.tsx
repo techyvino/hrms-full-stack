@@ -52,7 +52,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: 'id',
-    header: 'View Attendance',
+    header: 'Attendance',
     cell: ({ row }) => {
       return (
         <Link className="flex items-center rounded-md px-4 py-2" href={`admin/attendance/${row?.getValue('id')}`}>

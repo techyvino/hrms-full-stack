@@ -39,3 +39,22 @@ abbr:where([title]) {
   @apply text-background;
   @apply bg-none;
 }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Add rounded corners to the first and last cells of the table header */
+thead tr:first-child th:first-child {
+  border-top-left-radius: 15%;
+  border-bottom-left-radius: 15%;
+}
+thead tr:first-child th:last-child {
+  border-top-right-radius: 15%;
+  border-bottom-right-radius: 15%;
+}
+
+thead tr {
+  @apply bg-default-100 border-none;
+}
