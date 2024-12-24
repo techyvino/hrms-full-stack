@@ -44,7 +44,10 @@ activityRouter.get(
     },
   }),
   async (c) => {
-    const userId = Number(c.var.user.id)
+    const userId = Number(c.var?.user?.id)
+    if (!userId) {
+      return respondHandler(c, 'unauthorized', 'Unauthorized')
+    }
     try {
       const todayLogs = await getTodayPunchStatus(userId)
 

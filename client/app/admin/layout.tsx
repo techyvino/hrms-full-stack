@@ -7,7 +7,7 @@ interface LayoutProps {
 
 const AdminLayout = ({ children }: LayoutProps) => {
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex flex-col">
       <header className="bg-muted p-3 text-lg font-semibold">Admin</header>
       <main>{children}</main>
     </div>

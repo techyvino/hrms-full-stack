@@ -13,9 +13,10 @@ function useTimeDifference(targetDate: Date | null): TimeDifference {
   useEffect(() => {
     if (!targetDate) return // Exit if targetDate is null
 
+    const now = new Date()
+
     const intervalId = setInterval(() => {
-      const now = new Date()
-      const totalSeconds = differenceInSeconds(now, targetDate)
+      const totalSeconds = differenceInSeconds(now, targetDate) || 0
 
       // Calculate hours, minutes, and seconds
       const hours = Math.floor(totalSeconds / 3600)

@@ -37,9 +37,3 @@ export interface ClockedStatusData {
   istTimeStamp: string
   adjusted_clock_in_time: string
 }
-
-export interface ClockedStatus {
-  status: number
-  success: boolean
-  data: ClockedStatusData
-}

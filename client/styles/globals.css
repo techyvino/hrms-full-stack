@@ -29,7 +29,7 @@ abbr:where([title]) {
   border: 1px solid theme(colors.primary);
 }
 .dark .react-calendar__tile {
-  @apply bg-background;
+  @apply bg-background/5;
 }
 .dark .react-calendar__tile--active {
   @apply bg-primary;

@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { responseSchema } from '@/services/zod'
-
 export const UserSchema = z.object({
   id: z.number(),
   department: z.string(),
@@ -18,9 +16,9 @@ export const UserSchema = z.object({
   role_name: z.string(),
 })
 
-export const getUserListResponse = responseSchema.omit({ message: true }).extend({
-  data: z.array(UserSchema),
-})
+// export const getUserListResponse = responseSchema.omit({ message: true }).extend({
+//   data: z.array(UserSchema),
+// })
 
 export type User = z.infer<typeof UserSchema>
-export type UserListResponse = z.infer<typeof getUserListResponse>
+export type UserListResponse = User[]

@@ -1,5 +1,4 @@
 'use client'
-
 import type { ColumnDef } from '@tanstack/react-table'
 import { CalendarClock } from 'lucide-react'
 import Link from 'next/link'

@@ -1,3 +1,4 @@
+'use client'
 import { Card, CardBody, CardHeader } from '@nextui-org/react'
 import { History } from 'lucide-react'
 
@@ -5,13 +6,7 @@ import type { ClockEntry } from '@/app/dashboard/schemas'
 import { calculateDuration, formatDate, formatTime } from '@/lib/timeUtils'
 import { cn } from '@/lib/utils'
 
-export const TimeHistory = ({ entries }: { entries: ClockEntry[] }) => {
-  // const distanceInMins = (clock_in_time: string) =>
-  //   clock_in_time &&
-  //   formatDistanceToNow(clock_in_time, {
-  //     addSuffix: true,
-  //     includeSeconds: true,
-  //   })
+export const TimeHistory = ({ entries = [] }: { entries: ClockEntry[] }) => {
   return (
     <Card className="">
       <CardHeader className="border-b px-6 py-4">
@@ -38,10 +33,7 @@ export const TimeHistory = ({ entries }: { entries: ClockEntry[] }) => {
                 <div className="text-sm font-medium">
                   <div className="flex items-center justify-center gap-1">
                     <div
-                      className={cn(
-                        'size-3 rounded-full',
-                        entry.clock_out ? 'bg-gray-400' : 'bg-green-500 animate-pulse '
-                      )}
+                      className={cn('size-3 rounded-full', entry.clock_out ? 'hidden' : 'bg-green-500 animate-pulse ')}
                     />
                     <div className="m-0 p-0">
                       {calculateDuration(entry.clock_in, entry.clock_out || new Date().toISOString())}

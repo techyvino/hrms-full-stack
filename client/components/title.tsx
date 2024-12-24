@@ -1,3 +1,4 @@
+'use client'
 import { Button } from '@nextui-org/react'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'

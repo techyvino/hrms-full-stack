@@ -2,16 +2,17 @@
 
 import 'react-calendar/dist/Calendar.css'
 
-import { Card, CardBody, CardHeader, Skeleton } from '@nextui-org/react'
+import { Card, CardBody, Skeleton } from '@nextui-org/react'
 import { isWithinInterval } from 'date-fns'
 import { useEffect, useState } from 'react'
 import Calendar from 'react-calendar'
 
+import AttendanceInfo from '@/app/attendance/components/attendance-info'
 import Title from '@/components/title'
 import { useAccount } from '@/hooks/useAccount'
 import { useFetch } from '@/hooks/useFetch'
 import { getStartAndEndOfMonth } from '@/lib/date-utils'
-import { durationByMinutes, formatDate } from '@/lib/timeUtils'
+import { formatDate } from '@/lib/timeUtils'
 import { cn } from '@/lib/utils'
 
 export interface Entry {
@@ -56,13 +57,13 @@ export default function AttendancePage() {
   return (
     <div>
       <Title title="Attendance" />
-      <div className="flex w-full flex-col items-center justify-center gap-4 px-4 md:flex-row md:items-start">
+      <div className="flex w-full flex-col items-center justify-center gap-4 px-4">
         <Card className="mt-4">
           <CardBody className="w-full">
             <Skeleton className={cn(isLoading ? 'h-72 w-[22rem] rounded-lg' : 'hidden')} />
             <Calendar
               calendarType="gregory"
-              className={cn('rounded-lg !border-none px-5 dark:bg-background', isLoading && 'hidden')}
+              className={cn('rounded-lg !border-none px-5 dark:bg-background/5', isLoading && 'hidden')}
               defaultValue={selectedDate}
               next2Label={null}
               prev2Label={null}
@@ -103,43 +104,7 @@ export default function AttendancePage() {
             />
           </CardBody>
         </Card>
-        <Card fullWidth className="w-full">
-          <CardHeader className="border-b px-6 py-4">
-            <div className="flex w-full items-center justify-between font-semibold">
-              <p>{selectedDate && formatDate(selectedDate)}</p>
-              {selectedPunchInfo && (
-                <div className="flex items-center gap-2">
-                  <p>
-                    {selectedPunchInfo?.totalDurationInMinutes &&
-                      durationByMinutes(selectedPunchInfo?.totalDurationInMinutes, 'h', 'm', 0)}
-                  </p>
-                </div>
-              )}
-            </div>
-          </CardHeader>
-          <CardBody>
-            {selectedPunchInfo ? (
-              selectedPunchInfo?.entries.map((entry) => (
-                <div key={entry.id} className="flex items-center justify-between border-b last:border-b-0">
-                  <div className="my-4 flex gap-2">
-                    <p>{entry?.clockIn ? formatDate(entry?.clockIn, 'HH:mm') : 'NA'}</p>
-                    <span>{'-'}</span>
-                    <p>{entry?.clockOut ? formatDate(entry?.clockOut, 'HH:mm') : 'NA'}</p>
-                  </div>
-                  <div className="">
-                    <p>
-                      {entry?.clockIn && entry?.clockOut
-                        ? durationByMinutes(entry?.durationInMinutes)
-                        : 'Missing Clocked-out'}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="w-full">No History Found!</div>
-            )}
-          </CardBody>
-        </Card>
+        <AttendanceInfo selectedDate={selectedDate} selectedPunchInfo={selectedPunchInfo} />
       </div>
     </div>
   )

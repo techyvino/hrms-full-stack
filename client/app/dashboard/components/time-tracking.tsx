@@ -1,4 +1,4 @@
-import { Badge, Button, Card, CardBody, CardHeader, Skeleton } from '@nextui-org/react'
+import { Button, Card, CardBody, CardHeader, Skeleton } from '@nextui-org/react'
 import { Clock4, Clock10, LogIn } from 'lucide-react'
 import React from 'react'
 
@@ -21,16 +21,16 @@ const TimeTracking = ({ handlePunchClock, data, isLoading, isSubmitting }: TimeT
   return (
     <Card>
       <CardHeader className="border-b">
-        <div className="flex items-center justify-between">
+        <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-2 text-lg">
             <Clock10 />
             {`Today’s attendance`}
           </div>
           {isActive && (
-            <Badge color="success">
+            <div className="flex items-center rounded-full bg-success px-2 text-white">
               <Clock4 className="mr-1 size-4" />
               <p className={cn('text-md')}>Active</p>
-            </Badge>
+            </div>
           )}
         </div>
       </CardHeader>

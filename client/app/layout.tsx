@@ -31,11 +31,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html suppressHydrationWarning lang="en">
+    <html lang="en">
       <head />
-      <body className={clsx('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
-        <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
-          <NoSSRWrapper>
+      <body
+        suppressHydrationWarning
+        className={clsx('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
+      >
+        <NoSSRWrapper>
+          <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
             <Navbar />
             <AuthWrapper>{children}</AuthWrapper>
             <Toaster
@@ -45,8 +48,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 },
               }}
             />
-          </NoSSRWrapper>
-        </Providers>
+          </Providers>
+        </NoSSRWrapper>
       </body>
     </html>
   )

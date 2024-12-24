@@ -1,12 +1,12 @@
 'use client'
-
 import { Card, CardBody } from '@nextui-org/react'
+import { Coffee, Laptop } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
 
 import { TimeHistory } from '@/app/dashboard/components/time-history'
 import TimeTracking from '@/app/dashboard/components/time-tracking'
-import type { ClockedStatus } from '@/app/dashboard/schemas'
+import type { ClockedStatusData } from '@/app/dashboard/schemas'
 import { AttendanceIcon, LeaveIcon } from '@/components/icons'
 import { useAccount } from '@/hooks/useAccount'
 import { useFetch } from '@/hooks/useFetch'
@@ -18,10 +18,11 @@ import {
   getCurrentLocation,
   type LocationInfo,
 } from '@/lib/geolocation'
+import { calculateWorkAndBreakTime } from '@/lib/timeUtils'
 import { activityUrl } from '@/lib/urls'
 
 export default function Home() {
-  const { response, isLoading, fetcher } = useFetch<ClockedStatus>()
+  const { data, isLoading, fetcher } = useFetch<ClockedStatusData>()
   const { user_id } = useAccount()
   const { push } = useRouter()
 
@@ -72,7 +73,7 @@ export default function Home() {
       // ...locationInfo,
       ...deviceInfo,
       user_id,
-      clock_action: response?.data?.next_clock_action,
+      clock_action: data?.next_clock_action,
     }
 
     submit({
@@ -80,6 +81,8 @@ export default function Home() {
       data: bodyData,
     })
   }
+
+  const { totalBreakTime, totalWorkTime } = calculateWorkAndBreakTime(data?.entries || [])
 
   useEffect(() => {
     fetcher(activityUrl.clockedStatus)
@@ -101,14 +104,34 @@ export default function Home() {
           </CardBody>
         </Card>
       </div>
+      <div className="m-5 flex justify-between gap-5">
+        <Card className="flex h-20 w-1/2 items-center justify-center">
+          <CardBody className="flex items-center gap-2 font-bold">
+            <div className="flex gap-2">
+              <Laptop className="stroke-sky-600 " />
+              Work Time
+            </div>
+            <div className="">{totalWorkTime}</div>
+          </CardBody>
+        </Card>
+        <Card className="justify- flex h-20 w-1/2 items-center">
+          <CardBody className="flex items-center gap-2 font-bold">
+            <div className="flex gap-2">
+              <Coffee className="stroke-red-950" />
+              Break Time
+            </div>
+            <div className="">{totalBreakTime}</div>
+          </CardBody>
+        </Card>
+      </div>
       <div className="mx-5 space-y-5">
         <TimeTracking
-          data={response?.data}
+          data={data}
           handlePunchClock={handlePunchClock}
           isLoading={isLoading}
           isSubmitting={isSubmitting}
         />
-        <TimeHistory entries={response?.data?.entries || []} />
+        <TimeHistory entries={data?.entries || []} />
       </div>
     </main>
   )

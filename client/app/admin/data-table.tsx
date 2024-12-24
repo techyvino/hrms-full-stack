@@ -1,16 +1,24 @@
 'use client'
 
+import { Spinner } from '@nextui-org/react'
 import type { ColumnDef } from '@tanstack/react-table'
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
+
+// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
 }
 
-export function DataTable<TData, TValue>({ columns, data }: Readonly<DataTableProps<TData, TValue>>) {
+export function DataTable<TData, TValue>({
+  columns,
+  data = [],
+  isLoading = false,
+}: Readonly<DataTableProps<TData, TValue>>) {
   const table = useReactTable({
     data,
     columns,
@@ -19,7 +27,7 @@ export function DataTable<TData, TValue>({ columns, data }: Readonly<DataTablePr
 
   return (
     <div className="rounded-md border">
-      {/* <Table>
+      <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -33,8 +41,14 @@ export function DataTable<TData, TValue>({ columns, data }: Readonly<DataTablePr
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
+        <TableBody className="w-full">
+          {isLoading ? (
+            <TableRow>
+              <TableCell className="h-24 text-center" colSpan={columns.length}>
+                <Spinner />
+              </TableCell>
+            </TableRow>
+          ) : table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
@@ -50,7 +64,7 @@ export function DataTable<TData, TValue>({ columns, data }: Readonly<DataTablePr
             </TableRow>
           )}
         </TableBody>
-      </Table> */}
+      </Table>
     </div>
   )
 }

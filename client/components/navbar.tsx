@@ -58,15 +58,16 @@ export const Navbar = () => {
           <NavbarItem className="flex gap-2">
             <Dropdown>
               <DropdownTrigger className="cursor-pointer">
-                <Avatar
-                  isBordered
-                  showFallback
-                  name={name || ''}
-                  src="https://i.pravatasr.cc/150?u=a042581f4e29026024d"
-                />
+                <Avatar isBordered showFallback name={name || ''} />
               </DropdownTrigger>
               <DropdownMenu aria-label="Static Actions">
-                <DropdownItem key="logout" className="text-danger" color="danger" onPress={handleLogout}>
+                <DropdownItem
+                  key="logout"
+                  className="text-danger"
+                  color="danger"
+                  textValue="logout"
+                  onPress={handleLogout}
+                >
                   <div className="flex gap-2">
                     <LogOut className="cursor-pointer transition-opacity hover:opacity-80" />
                     <span className="font-semibold">Logout</span>
