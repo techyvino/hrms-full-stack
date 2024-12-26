@@ -3,7 +3,6 @@ import 'zod-openapi/extend'
 import { z } from 'zod'
 
 import { HttpStatusCode } from '@/lib/http-status'
-import { createTrimmedString } from '@/lib/utils'
 
 export const responseSchema = z.object({
   message: z.string(),
@@ -13,19 +12,37 @@ export const responseSchema = z.object({
 
 // Login - Request
 export const loginRequestSchema = z.object({
-  username: createTrimmedString(),
-  password: createTrimmedString(),
-  platform: z.string().nullable().optional(),
-  operating_system: z.string().nullable().optional(),
-  os_version: z.string().nullable().optional(),
-  manufacturer: z.string().nullable().optional(),
-  device_name: z.string().nullable().optional(),
-  device_model: z.string().nullable().optional(),
-  latitude: z.number().optional().nullable(),
-  longitude: z.number().optional().nullable(),
-  locality: z.string().nullable().optional(),
-  area: z.string().nullable().optional(),
-  postal_code: z.string().nullable().optional(),
+  username: z.string().min(1, { message: 'Username is required' }),
+  password: z.string().min(1, { message: 'Password is required' }),
+  device_info: z
+    .object({
+      platform: z.string().optional().nullable(),
+      operating_system: z.string().optional().nullable(),
+      os_version: z.string().optional().nullable(),
+      manufacturer: z.string().optional().nullable(),
+      device_name: z.string().optional().nullable(),
+      device_model: z.string().optional().nullable(),
+    })
+    .passthrough()
+    .nullable()
+    .optional(),
+  location_info: z
+    .object({
+      latitude: z.number().optional().nullable(),
+      longitude: z.number().optional().nullable(),
+      accuracy: z.number().optional().nullable(),
+      timestamp: z.number().optional().nullable(),
+
+      locality: z.string().optional().nullable(),
+      area: z.string().optional().nullable(),
+      postal_code: z.string().optional().nullable(),
+
+      speed: z.number().optional().nullable(),
+      altitude: z.number().optional().nullable(),
+    })
+    .passthrough()
+    .nullable()
+    .optional(),
 })
 
 // Login - Response

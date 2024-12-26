@@ -72,25 +72,27 @@ export const calculateWorkAndBreakTime = (entries: { clock_in: string; clock_out
 
   for (let i = 0; i < sortedEntries.length; i++) {
     const currentEntry = sortedEntries[i]
-    const clockInTime = currentEntry?.clock_in ? timeToSeconds(parseISO(currentEntry?.clock_in)) : 0
-    const clockOutTime = currentEntry?.clock_out
-      ? timeToSeconds(parseISO(currentEntry?.clock_out))
-      : new Date().getTime() / 1000 // Use current time if no clock-out time is available
 
-    // Add to total work time (clock-out - clock-in)
-    totalWorkTimeInSeconds += clockOutTime - clockInTime
+    if (currentEntry.clock_in && currentEntry.clock_out) {
+      const clockInTime = currentEntry?.clock_in ? timeToSeconds(parseISO(currentEntry?.clock_in)) : 0
+      const clockOutTime = currentEntry?.clock_out
+        ? timeToSeconds(parseISO(currentEntry?.clock_out))
+        : new Date().getTime() / 1000 // Use current time if no clock-out time is available
 
-    // Calculate break time (if there is a next entry, calculate the break time as the difference between current clock-out and next clock-in)
-    if (i < sortedEntries.length - 1) {
-      const nextClockInEntry = sortedEntries[i + 1]?.clock_in
-      const nextClockInTime = nextClockInEntry ? timeToSeconds(parseISO(nextClockInEntry)) : 0
+      // Add to total work time (clock-out - clock-in)
+      totalWorkTimeInSeconds += clockOutTime - clockInTime
 
-      if (nextClockInTime > clockOutTime) {
-        totalBreakTimeInSeconds += nextClockInTime - clockOutTime
+      // Calculate break time (if there is a next entry, calculate the break time as the difference between current clock-out and next clock-in)
+      if (i < sortedEntries.length - 1) {
+        const nextClockInEntry = sortedEntries[i + 1]?.clock_in
+        const nextClockInTime = nextClockInEntry ? timeToSeconds(parseISO(nextClockInEntry)) : 0
+
+        if (nextClockInTime > clockOutTime) {
+          totalBreakTimeInSeconds += nextClockInTime - clockOutTime
+        }
       }
     }
   }
-
   const totalWorkTimeInMinutes = totalWorkTimeInSeconds / 60 // Convert seconds to minutes
   const totalBreakTimeInMinutes = totalBreakTimeInSeconds / 60 // Convert seconds to minutes
 

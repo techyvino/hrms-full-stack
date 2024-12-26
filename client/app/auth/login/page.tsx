@@ -1,6 +1,5 @@
 'use client'
 
-import { Capacitor } from '@capacitor/core'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Card, CardBody, CardHeader, Form } from '@nextui-org/react'
 import { setCookie } from 'cookies-next/client'
@@ -14,7 +13,7 @@ import { loginSchema } from '@/app/auth/login/schemas'
 import { InputForm } from '@/components/form/InputForm'
 import { useSubmit } from '@/hooks/useSubmit'
 import { getDeviceInfo } from '@/lib/device'
-import { formateLocationInfo, getAddressFromCoordinates, getCurrentLocation } from '@/lib/geolocation'
+import { getCurrentAddress } from '@/lib/geolocation'
 import { authUrl } from '@/lib/urls'
 
 export default function LoginForm() {
@@ -25,10 +24,12 @@ export default function LoginForm() {
     defaultValues: {
       username: '',
       password: '',
+      device_info: null,
+      location_info: null,
     },
   })
 
-  const { isLoading, submit } = useSubmit<LoginResponse>({
+  const { isLoading, submit, startLoader } = useSubmit<LoginResponse>({
     onError: (error) => {
       toast.error(error?.message || 'Login Failed')
     },
@@ -46,43 +47,20 @@ export default function LoginForm() {
   })
 
   const onSubmit = form.handleSubmit(async (data) => {
+    startLoader()
+    const location_info = await getCurrentAddress()
     // for android and ios
-    if (Capacitor.isNativePlatform()) {
-      const { platform, manufacturer, operating_system, os_version, device_model, device_name } = await getDeviceInfo()
-
-      const position = await getCurrentLocation()
-      const address = await getAddressFromCoordinates(position?.coords?.latitude, position?.coords.longitude)
-      const formattedLocation = formateLocationInfo({
-        position,
-        address,
-      })
-
-      const bodyData: LoginSchema = {
-        username: data?.username,
-        password: data?.password,
-        platform,
-        manufacturer,
-        operating_system,
-        os_version,
-        device_name,
-        device_model,
-
-        latitude: formattedLocation?.latitude,
-        longitude: formattedLocation?.longitude,
-        locality: formattedLocation?.locality,
-        area: formattedLocation?.area,
-        postal_code: formattedLocation?.postal_code,
-      }
-
-      return submit({
-        url: authUrl.login,
-        data: bodyData,
-      })
+    const device_info = await getDeviceInfo()
+    const bodyData: LoginSchema = {
+      username: data?.username,
+      password: data?.password,
+      device_info,
+      location_info,
     }
 
     return submit({
       url: authUrl.login,
-      data,
+      data: bodyData,
     })
   })
 

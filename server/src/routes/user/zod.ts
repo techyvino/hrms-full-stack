@@ -56,7 +56,7 @@ export const updateUserValuesSchema = signUpValuesSchema
   })
 
 // GET - Get user details by ID - Request
-export const userIdParamSchema = z.object({
+export const idParamSchema = z.object({
   id: z.string({ message: 'User id is required' }),
 })
 

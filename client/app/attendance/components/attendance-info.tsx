@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 interface AttendanceInfoProps {
   selectedDate: Date
   selectedPunchInfo?: PunchInfo
+  isAdmin?: boolean
 }
 
 const AttendanceInfo = ({ selectedDate, selectedPunchInfo }: AttendanceInfoProps) => {

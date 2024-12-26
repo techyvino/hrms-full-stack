@@ -55,7 +55,7 @@ export const columns: ColumnDef<User>[] = [
     header: 'Attendance',
     cell: ({ row }) => {
       return (
-        <Link className="flex items-center rounded-md px-4 py-2" href={`admin/attendance/${row?.getValue('id')}`}>
+        <Link className="flex items-center rounded-md px-4 py-2" href={`admin/attendance?id=${row?.getValue('id')}`}>
           <CalendarClock className="hover:stroke-blue-700" />
         </Link>
       )

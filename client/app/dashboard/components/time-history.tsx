@@ -36,7 +36,7 @@ export const TimeHistory = ({ entries = [] }: { entries: ClockEntry[] }) => {
                       className={cn('size-3 rounded-full', entry.clock_out ? 'hidden' : 'bg-green-500 animate-pulse ')}
                     />
                     <div className="m-0 p-0">
-                      {calculateDuration(entry.clock_in, entry.clock_out || new Date().toISOString())}
+                      {entry?.clock_out ? calculateDuration(entry.clock_in, entry.clock_out) : 'Active'}
                     </div>
                   </div>
                 </div>

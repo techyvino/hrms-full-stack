@@ -2,20 +2,15 @@
 import type { ReactNode } from 'react'
 import React, { useEffect } from 'react'
 
-import { checkLocationPermission, reqLocationPermission } from '@/lib/geolocation'
-import { checkNotificationPermission, getNotificationPermission } from '@/lib/notification'
+import { checkAndRequestLocationPermission } from '@/lib/geolocation'
+import { checkNotificationPermission } from '@/lib/notification'
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const getPermissions = async () => {
     const NotifyPermissionStatus = await checkNotificationPermission()
-    const LocationPermissionStatus = await checkLocationPermission()
+    const LocationPermissionStatus = await checkAndRequestLocationPermission()
 
-    if (NotifyPermissionStatus !== 'granted') {
-      getNotificationPermission()
-    }
-    if (LocationPermissionStatus !== 'granted') {
-      reqLocationPermission()
-    }
+    return { NotifyPermissionStatus, LocationPermissionStatus }
   }
 
   useEffect(() => {

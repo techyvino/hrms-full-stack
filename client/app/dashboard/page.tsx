@@ -2,7 +2,7 @@
 import { Card, CardBody } from '@nextui-org/react'
 import { Coffee, Laptop } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { TimeHistory } from '@/app/dashboard/components/time-history'
 import TimeTracking from '@/app/dashboard/components/time-tracking'
@@ -12,12 +12,7 @@ import { useAccount } from '@/hooks/useAccount'
 import { useFetch } from '@/hooks/useFetch'
 import { useSubmit } from '@/hooks/useSubmit'
 import { getDeviceInfo } from '@/lib/device'
-import {
-  formateLocationInfo,
-  getAddressFromCoordinates,
-  getCurrentLocation,
-  type LocationInfo,
-} from '@/lib/geolocation'
+import { getCurrentAddress } from '@/lib/geolocation'
 import { calculateWorkAndBreakTime } from '@/lib/timeUtils'
 import { activityUrl } from '@/lib/urls'
 
@@ -26,25 +21,16 @@ export default function Home() {
   const { user_id } = useAccount()
   const { push } = useRouter()
 
-  const { submit, isLoading: isSubmitting } = useSubmit({
+  const {
+    submit,
+    isLoading: isSubmitting,
+    startLoader,
+    stopLoader,
+  } = useSubmit({
     onSuccess: () => {
       fetcher(activityUrl?.clockedStatus)
     },
   })
-
-  const getCurrentAddress = useCallback(async () => {
-    const position = await getCurrentLocation()
-    const address = await getAddressFromCoordinates(position?.coords?.latitude, position?.coords.longitude)
-
-    if (address && position) {
-      const formattedLocation: LocationInfo = formateLocationInfo({
-        address,
-        position,
-      })
-
-      return formattedLocation
-    } else return {} as LocationInfo
-  }, [])
 
   // const startLiveTracker = useCallback(async () => {
   //   const trackingId = await addLocationWatcher(async (location) => {
@@ -66,17 +52,20 @@ export default function Home() {
   // Create a DateTime object in IST
 
   const handlePunchClock = async () => {
+    startLoader()
     const deviceInfo = await getDeviceInfo()
+    const locationInfo = await getCurrentAddress()
 
-    // const locationInfo = await getCurrentAddress()
+    if (!locationInfo) return stopLoader()
+
     const bodyData = {
-      // ...locationInfo,
+      ...locationInfo,
       ...deviceInfo,
       user_id,
       clock_action: data?.next_clock_action,
     }
 
-    submit({
+    return submit({
       url: activityUrl.punchClock,
       data: bodyData,
     })
@@ -97,7 +86,7 @@ export default function Home() {
             View Attendance
           </CardBody>
         </Card>
-        <Card className="flex h-20 w-1/2 items-center justify-center">
+        <Card isPressable className="flex h-20 w-1/2 items-center justify-center" onPress={() => push('/admin')}>
           <CardBody className="flex items-center gap-2 font-bold">
             <LeaveIcon size={90} />
             Request Time Off

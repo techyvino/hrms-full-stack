@@ -8,6 +8,8 @@ export const authUrl = {
 export const activityUrl = {
   clockedStatus: `/clockStatus`,
   punchClock: '/punchClock',
+  attendance: (id: string) => `/attendance/${id}`,
+  punchInfo: (id: number | string) => `/punchInfo/${id}`,
 }
 
 export const userUrl = {

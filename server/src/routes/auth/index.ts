@@ -52,8 +52,12 @@ authRouter.post(
     }
   }),
   async (c) => {
-    const { username, password, ...rest }: z.infer<typeof loginRequestSchema> =
-      await c.req.json()
+    const {
+      username,
+      password,
+      device_info,
+      location_info,
+    }: z.infer<typeof loginRequestSchema> = await c.req.json()
 
     try {
       const [user] = await db
@@ -120,7 +124,8 @@ authRouter.post(
         user_id: user.id,
         session_id: jwtPayload?.session_id,
         loginAt: dateTimeNow(),
-        ...rest,
+        device_info,
+        location_info,
       })
 
       // update token on db
@@ -131,7 +136,6 @@ authRouter.post(
           login_attempts: 0,
           access_token,
           session_id: jwtPayload?.session_id,
-          ...rest,
         })
         .where(eq(usersTable.id, user.id))
         .returning()

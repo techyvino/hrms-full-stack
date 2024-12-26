@@ -8,6 +8,12 @@ const config: CapacitorConfig = {
     url: 'http://192.168.0.108:5000',
     cleartext: true,
   },
+  plugins: {
+    NativeSettings: {
+      androidSettings: ['Location', 'Wifi', 'Bluetooth'],
+      iosSettings: ['GPS', 'Bluetooth'],
+    },
+  },
 }
 
 export default config

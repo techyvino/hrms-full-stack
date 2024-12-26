@@ -17,6 +17,8 @@ type UseSubmitResult<T> = {
   error: AxiosError<ApiError> | null
   isLoading: boolean
   isError: boolean
+  startLoader: () => void
+  stopLoader: () => void
   submit: (reqConfig: AxiosRequestConfig) => Promise<void>
 }
 
@@ -40,6 +42,7 @@ export function useSubmit<T = unknown>(options: UseSubmitOptions<T> = {}): UseSu
           method: 'POST',
           ...reqConfig,
         })
+
         setData(response.data) // Assuming response contains the submitted data
 
         // Optional success callback
@@ -66,10 +69,20 @@ export function useSubmit<T = unknown>(options: UseSubmitOptions<T> = {}): UseSu
     [submitFn]
   )
 
+  const startLoader = useCallback(() => {
+    setIsLoading(true)
+  }, [])
+
+  const stopLoader = useCallback(() => {
+    setIsLoading(false)
+  }, [])
+
   return {
     data,
     error,
     isLoading,
+    startLoader,
+    stopLoader,
     isError: error !== null,
     submit,
   }

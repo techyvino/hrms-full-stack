@@ -1,8 +1,10 @@
+/* eslint-disable no-use-before-define */
 import { Capacitor, registerPlugin } from '@capacitor/core'
 import type { Position } from '@capacitor/geolocation'
 import { Geolocation } from '@capacitor/geolocation'
 import type { BackgroundGeolocationPlugin, CallbackError, Location } from '@capacitor-community/background-geolocation'
 import { type Address, NativeGeocoder } from '@capgo/nativegeocoder'
+import { AndroidSettings, IOSSettings, NativeSettings } from 'capacitor-native-settings'
 
 import { IsNative } from '@/lib/utils'
 
@@ -15,6 +17,9 @@ type formateLocationParams = {
   position?: Position
   location?: Location
 }
+
+// Type declarations
+export type LocationInfo = ReturnType<typeof formateLocationInfo>
 
 export const formateLocationInfo = ({ address, position, location }: formateLocationParams) => {
   return {
@@ -32,34 +37,33 @@ export const formateLocationInfo = ({ address, position, location }: formateLoca
   }
 }
 
-export const checkLocationPermission = async () => {
-  if (IsNative) {
-    return (await Geolocation.checkPermissions())?.location
-  } else {
-    return 'denied'
-  }
-}
-export const reqLocationPermission = async () => {
-  if (!IsNative) {
-    return 'denied'
-  }
+export async function checkAndRequestLocationPermission() {
+  try {
+    const permissionStatus = await Geolocation.checkPermissions()
 
-  return await Geolocation.requestPermissions()
-}
-export const getCurrentLocation = async () => {
-  if (!IsNative) {
-    const position: Position = {} as Position
+    if (permissionStatus.location === 'granted') {
+      const position = await Geolocation.getCurrentPosition()
 
-    // Use a Promise to wrap the navigator API
-    navigator.geolocation.getCurrentPosition((pos) => {
-      position.coords = pos.coords
-      position.timestamp = pos.timestamp
+      return position
+    } else {
+      const requestStatus = await Geolocation.requestPermissions()
+
+      if (requestStatus.location === 'granted') {
+        const position = await Geolocation.getCurrentPosition()
+
+        return position
+      } else {
+        alert('Location permission is required for this feature. Please enable it in settings.')
+      }
+    }
+  } catch {
+    alert('Please turn on location services.')
+
+    NativeSettings.open({
+      optionAndroid: AndroidSettings.Location,
+      optionIOS: IOSSettings.LocationServices,
     })
-
-    return position
   }
-
-  return await Geolocation.getCurrentPosition()
 }
 
 export const addLocationWatcher = async (
@@ -114,5 +118,18 @@ export const getAddressFromCoordinates = async (latitude: number, longitude: num
   return {} as Address
 }
 
-// Type declarations
-export type LocationInfo = ReturnType<typeof formateLocationInfo>
+export const getCurrentAddress = async () => {
+  const position = await checkAndRequestLocationPermission()
+
+  const address =
+    position && IsNative && (await getAddressFromCoordinates(position?.coords?.latitude, position?.coords.longitude))
+
+  if (address && position) {
+    const formattedLocation: LocationInfo = formateLocationInfo({
+      address,
+      position,
+    })
+
+    return formattedLocation
+  } else return {} as LocationInfo
+}

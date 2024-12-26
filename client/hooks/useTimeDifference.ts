@@ -7,13 +7,13 @@ interface TimeDifference {
   seconds: string | number
 }
 
-function useTimeDifference(targetDate: Date | null): TimeDifference {
+function useTimeDifference(targetDate: Date | null, endDate: Date = new Date()): TimeDifference {
   const [timeDifference, setTimeDifference] = useState<TimeDifference>({ hours: 0, minutes: 0, seconds: 0 })
 
   useEffect(() => {
     if (!targetDate) return // Exit if targetDate is null
 
-    const now = new Date()
+    const now = endDate || new Date()
 
     const intervalId = setInterval(() => {
       const totalSeconds = differenceInSeconds(now, targetDate) || 0

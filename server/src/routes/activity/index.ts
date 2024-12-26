@@ -1,9 +1,10 @@
 import type { NeonDbError } from '@neondatabase/serverless'
-import { sql } from 'drizzle-orm'
+import { eq, getTableColumns, sql } from 'drizzle-orm'
 import { describeRoute } from 'hono-openapi'
 import { resolver } from 'hono-openapi/zod'
 import type { z } from 'zod'
 
+import { db } from '@/db'
 import { activityLogTable } from '@/db/schemas/activity.schema'
 import { createRouter } from '@/lib/create-app'
 import { dbError } from '@/lib/error-handling'
@@ -20,8 +21,9 @@ import {
 import {
   clockedInStatusResponseSchema,
   punchClockRequestSchema,
+  punchInfoResponseSchema,
 } from '@/routes/activity/zod'
-import { startEndDateQuerySchema, userIdParamSchema } from '@/routes/user/zod'
+import { idParamSchema, startEndDateQuerySchema } from '@/routes/user/zod'
 
 const activityRouter = createRouter()
 const tags = ['Activity']
@@ -118,7 +120,7 @@ activityRouter.get(
     description: 'get attendance status by id and start and end date',
     tags,
   }),
-  zodValidator('param', userIdParamSchema),
+  zodValidator('param', idParamSchema),
   zodValidator('query', startEndDateQuerySchema),
   async (c) => {
     const userId = Number(c.req.param('id'))
@@ -164,6 +166,38 @@ activityRouter.get(
     }))
 
     return respondHandler(c, 'success', entriesWithDuration)
+  }
+)
+
+activityRouter.get(
+  '/punchInfo/:id',
+  describeRoute({
+    summary: 'Get Punch Info by ID',
+    description: 'get punch detailed information by activity id',
+    tags,
+    responses: {
+      200: {
+        description: 'Successfully get Punch info',
+        content: {
+          'application/json': {
+            schema: resolver(punchInfoResponseSchema),
+          },
+        },
+      },
+    },
+  }),
+  zodValidator('param', idParamSchema),
+  async (c) => {
+    const id = Number(c.req.param('id'))
+
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    const { createdAt, updatedAt, ...rest } = getTableColumns(activityLogTable)
+    const [punchInfo] = await db
+      .select({ ...rest })
+      .from(activityLogTable)
+      .where(eq(activityLogTable.id, id))
+
+    return respondHandler(c, 'success', punchInfo)
   }
 )
 

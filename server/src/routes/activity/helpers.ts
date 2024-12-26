@@ -98,10 +98,32 @@ export const handleClockIn = async (
     return respondHandler(c, 'conflict', 'Already clocked in')
   }
 
+  const {
+    user_id,
+    platform,
+    os_version,
+    operating_system,
+    manufacturer,
+    device_name,
+    device_model,
+    ...locationInfo
+  } = body
+
   return await db
     .insert(activityLogTable)
     .values({
-      ...body,
+      user_id,
+      clock_in_device: {
+        platform,
+        os_version,
+        operating_system,
+        manufacturer,
+        device_name,
+        device_model,
+      },
+      clock_in_location: {
+        ...locationInfo,
+      },
       clock_in: dateTimeNow(),
       clock_out: null,
     })
@@ -117,9 +139,34 @@ export const handleClockOut = async (
     return respondHandler(c, 'conflict', 'Already clocked out')
   }
 
+  const {
+    user_id,
+    platform,
+    os_version,
+    operating_system,
+    manufacturer,
+    device_name,
+    device_model,
+    ...locationInfo
+  } = body
+
   return await db
     .update(activityLogTable)
-    .set({ ...body, clock_out: dateTimeNow() })
+    .set({
+      user_id,
+      clock_out_device: {
+        platform,
+        os_version,
+        operating_system,
+        manufacturer,
+        device_name,
+        device_model,
+      },
+      clock_out_location: {
+        ...locationInfo,
+      },
+      clock_out: dateTimeNow(),
+    })
     .where(eq(activityLogTable.id, lastClockedInInfo.id))
     .returning()
 }
