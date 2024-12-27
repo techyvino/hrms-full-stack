@@ -1,10 +1,41 @@
 {
-  "cSpell.words": ["neondatabase", "nodenext", "sonarjs"],
+  "cSpell.words": [
+    "dlgb",
+    "HRMR",
+    "HRMS",
+    "ilike",
+    "Kolkata",
+    "neondatabase",
+    "nodenext",
+    "sonarjs",
+    "sslmode"
+  ],
   "eslint.enable": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
   "javascript.preferences.importModuleSpecifier": "non-relative",
-  "typescript.preferences.importModuleSpecifier": "non-relative"
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#581715",
+    "activityBar.background": "#581715",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#1f8122",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "commandCenter.border": "#e7e7e799",
+    "sash.hoverBorder": "#581715",
+    "statusBar.background": "#2f0c0b",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#581715",
+    "statusBarItem.remoteBackground": "#2f0c0b",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#2f0c0b",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#2f0c0b99",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "2F0C0B",
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }

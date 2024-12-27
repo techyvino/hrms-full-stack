@@ -1,7 +1,7 @@
 import type { NeonDbError } from '@neondatabase/serverless'
 
 import env from '@/env.js'
-// eslint-disable-next-line unicorn/prevent-abbreviations
+
 export const dbError = (error: NeonDbError) => {
   const errorMessages: Record<string, string> = {
     '23505':
@@ -16,7 +16,7 @@ export const dbError = (error: NeonDbError) => {
       'The database does not exist. Please ensure you are connecting to the correct database.',
     // Add more error codes and messages as needed
   }
-  const isProduction = env.NODE_ENV === 'production'
+  const isProduction = env.ENV === 'production'
 
   return {
     message: error?.code

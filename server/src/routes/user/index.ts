@@ -1,22 +1,50 @@
-import { zValidator } from '@hono/zod-validator'
 import type { NeonDbError } from '@neondatabase/serverless'
-import { eq } from 'drizzle-orm'
-import { Hono } from 'hono'
-import { z } from 'zod'
+import { eq, getTableColumns, ilike, or } from 'drizzle-orm'
+import { describeRoute } from 'hono-openapi'
+import { resolver, validator } from 'hono-openapi/zod'
+import type { z } from 'zod'
 
 import { db } from '@/db'
-import { roleTypeTable, sitesTable, usersTable } from '@/db/schemas'
+import { roleTypeTable } from '@/db/schemas/role.schema'
+import { sitesTable } from '@/db/schemas/sites.schema'
+import { usersTable } from '@/db/schemas/user.schema'
 import { generateHashedPassword } from '@/lib/auth'
+import { createRouter } from '@/lib/create-app'
 import { dbError } from '@/lib/error-handling'
+import { respondHandler } from '@/lib/http-status'
 import { formatZodErrors } from '@/lib/utils'
-import { signUpValuesSchema } from '@/zod/schemas/user'
+import { zodValidator } from '@/middleware/zod-validator'
+import { responseSchema } from '@/routes/auth/zod'
+import {
+  getUserDetailsResponse,
+  getUserListResponse,
+  idParamSchema,
+  signUpValuesSchema,
+  updateUserValuesSchema,
+} from '@/routes/user/zod'
 
-const userRouter = new Hono()
+const userRouter = createRouter()
+const tags = ['User Management']
 
 // register new user
 userRouter.post(
   '/register',
-  zValidator('json', signUpValuesSchema, (result, c) => {
+  describeRoute({
+    summary: 'Register new user',
+    description: 'Register new user',
+    tags,
+    responses: {
+      201: {
+        description: 'User created successfully',
+        content: {
+          'application/json': {
+            schema: resolver(responseSchema),
+          },
+        },
+      },
+    },
+  }),
+  validator('json', signUpValuesSchema, (result, c) => {
     if (!result.success) {
       return c.json(formatZodErrors(result?.error), 400)
     }
@@ -31,7 +59,7 @@ userRouter.post(
       .where(eq(usersTable.mobile_no, rest.mobile_no))
 
     if (isUserExist.length > 0) {
-      return c.json({ message: 'User already exist' }, 409)
+      return respondHandler(c, 'conflict', 'User already exist')
     }
 
     const hashedPassword = await generateHashedPassword(password)
@@ -42,60 +70,78 @@ userRouter.post(
         .values({ password: hashedPassword, ...rest })
         .returning()
 
-      return c.json(
-        {
-          message: 'User Created Successfully',
-        },
-        201
-      )
+      return respondHandler(c, 'created', 'User Created Successfully')
     } catch (error) {
-      return c.json({ error: dbError(error as NeonDbError) }, 500)
+      return respondHandler(c, 'server_error', dbError(error as NeonDbError))
     }
   }
 )
 
 // user profile update
-userRouter.post('/profile-update', async (c) => {
-  const body: z.infer<typeof signUpValuesSchema> = await c.req.json()
+userRouter.post(
+  '/user',
+  describeRoute({
+    summary: 'Profile update',
+    description: 'update user profile information',
+    tags,
+    responses: {
+      200: {
+        description: 'User profile updated successfully',
+        content: {
+          'application/json': {
+            schema: resolver(responseSchema),
+          },
+        },
+      },
+    },
+  }),
+  zodValidator('json', updateUserValuesSchema),
+  async (c) => {
+    const body: z.infer<typeof updateUserValuesSchema> = await c.req.json()
 
-  try {
-    const result = await db
-      .update(usersTable)
-      .set({ ...body })
-      .where(eq(usersTable.mobile_no, body.mobile_no))
-      .returning()
-    if (result?.length === 0) {
-      return c.json({ message: 'User not found' }, 400)
-    }
-    return c.json({
-      message: 'Profile Updated successfully',
-    })
-  } catch (error) {
-    if (error) {
-      return c.json({ error }, 400)
+    try {
+      const result = await db
+        .update(usersTable)
+        .set({ ...body })
+        .where(eq(usersTable.id, body?.user_id))
+        .returning()
+
+      if (result?.length === 0) {
+        return respondHandler(c, 'unauthorized', 'User not found')
+      }
+      return respondHandler(c, 'success', 'User successfully updated')
+    } catch (error) {
+      if (error) {
+        return respondHandler(c, 'server_error', dbError(error as NeonDbError))
+      }
     }
   }
-})
+)
 
 // get user info by id
 userRouter.get(
-  '/getUserDetail/:id',
-  zValidator(
-    'param',
-    z.object({
-      id: z.string(),
-    }),
-    (result, c) => {
-      if (!result.success) {
-        return c.json(formatZodErrors(result?.error), 400)
-      }
-    }
-  ),
+  '/user/:id',
+  describeRoute({
+    summary: 'Get user',
+    description: 'Get user details by id',
+    tags,
+    responses: {
+      200: {
+        description: 'User details fetched successfully',
+        content: {
+          'application/json': {
+            schema: resolver(getUserDetailsResponse),
+          },
+        },
+      },
+    },
+  }),
+  zodValidator('param', idParamSchema),
   async (c) => {
-    const userId = Number(c.req.param('id') || 0)
+    const userId = Number(c.req.param('id'))
 
     if (!userId) {
-      return c.json({ message: 'Invalid user id' })
+      return respondHandler(c, 'not_found', 'Invalid user id')
     }
 
     try {
@@ -107,7 +153,7 @@ userRouter.get(
         .leftJoin(roleTypeTable, eq(usersTable.role_id, roleTypeTable.id))
 
       if (result.length === 0) {
-        return c.json({ message: 'User details not found' }, 403)
+        return respondHandler(c, 'unauthorized', 'Invalid user')
       }
 
       const [{ users, sites, role_type }] = result
@@ -146,13 +192,85 @@ userRouter.get(
         identification_type: users?.identification_type,
         identification_number: users?.identification_number,
         live_tracker_enabled: users?.live_tracker_enabled,
-        sites,
-        role_type,
+        site_id: sites?.id,
+        site_name: sites?.name,
+        site_code: sites?.code,
+        role_id: role_type?.id,
+        role_name: role_type?.name,
+        role_code: role_type?.code,
       }
 
       return c.json({ data: response })
     } catch (error) {
       return c.json({ error: dbError(error as NeonDbError) }, 500)
+    }
+  }
+)
+
+userRouter.get(
+  '/users',
+  describeRoute({
+    summary: 'Get user list',
+    description: 'Get all user list',
+    tags,
+    responses: {
+      200: {
+        description: 'User List fetched successfully',
+        content: {
+          'application/json': {
+            schema: resolver(getUserListResponse),
+          },
+        },
+      },
+    },
+  }),
+  async (c) => {
+    try {
+      const searchTerm = c.req.query('q') || ''
+      const {
+        id,
+        department,
+        designation,
+        email,
+        mobile_no,
+        gender,
+        joined_date,
+        live_tracker_enabled,
+        marital_status,
+        name,
+        status,
+      } = getTableColumns(usersTable)
+
+      const result = await db
+        .select({
+          id,
+          department,
+          designation,
+          email,
+          mobile_no,
+          gender,
+          joined_date,
+          live_tracker_enabled,
+          marital_status,
+          name,
+          status,
+          site_name: sitesTable.name,
+          role_name: roleTypeTable.name,
+        })
+        .from(usersTable)
+        .where(
+          or(
+            ilike(usersTable.name, `%${searchTerm}%`),
+            ilike(usersTable.email, `%${searchTerm}%`),
+            ilike(usersTable.mobile_no, `%${searchTerm}%`)
+          )
+        )
+        .leftJoin(sitesTable, eq(usersTable.site_id, sitesTable.id))
+        .leftJoin(roleTypeTable, eq(usersTable.role_id, roleTypeTable.id))
+
+      return respondHandler(c, 'success', result)
+    } catch (error) {
+      return respondHandler(c, 'server_error', dbError(error as NeonDbError))
     }
   }
 )

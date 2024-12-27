@@ -2,7 +2,7 @@ import { eq, getTableColumns } from 'drizzle-orm'
 import type { Context } from 'hono'
 
 import { db } from '@/db'
-import { usersTable } from '@/db/schemas'
+import { usersTable } from '@/db/schemas/user.schema'
 import { verifyToken } from '@/lib/auth'
 
 export const authMiddleware = async (c: Context, next: () => Promise<void>) => {
@@ -13,6 +13,8 @@ export const authMiddleware = async (c: Context, next: () => Promise<void>) => {
     '/api/auth/reset-password',
     '/api/auth/refresh-token',
     '/api/user/register',
+    '/api/user/add-site',
+    '/api/user/add-role',
   ]
 
   // Exclude login and register routes
@@ -67,7 +69,7 @@ export const authMiddleware = async (c: Context, next: () => Promise<void>) => {
       )
     }
 
-    c.set('jwtPayload', payload) // Store payload in context for later use
+    c.set('user', payload) // Store payload in context for later use
     await next()
   } catch (error) {
     return c.json({ message: 'Unauthorized user', details: error }, 401)

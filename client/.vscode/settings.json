@@ -13,9 +13,12 @@
     "hookform",
     "hrms",
     "Kolkata",
+    "luxon",
+    "messageformat",
     "nativegeocoder",
     "neondatabase",
     "nextui",
+    "Pressable",
     "signup",
     "sonner",
     "tseslint",
@@ -37,7 +40,5 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.format.enable": true,
   "eslint.nodePath": "./node_modules/eslint",
-  "editor.quickSuggestions": {
-    "strings": "on"
-  }
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }

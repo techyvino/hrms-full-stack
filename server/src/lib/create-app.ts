@@ -1,18 +1,29 @@
-import notFound from '@/lib/not-found'
-import serveEmojiFavicon from '@/lib/serve-emoji-favicon'
-import { pinoLogger } from '@/middleware/logger'
 import { swaggerUI } from '@hono/swagger-ui'
 import { apiReference } from '@scalar/hono-api-reference'
 import { Hono } from 'hono'
-import { openAPISpecs } from 'hono-openapi'
+import { cors } from 'hono/cors'
 import { prettyJSON } from 'hono/pretty-json'
+import { openAPISpecs } from 'hono-openapi'
+
+import notFound from '@/lib/not-found'
+import serveEmojiFavicon from '@/lib/serve-emoji-favicon'
+import type { AppBindings } from '@/lib/types'
+import { pinoLogger } from '@/middleware/logger'
+
+export const createRouter = () => {
+  return new Hono<AppBindings>({
+    strict: false,
+  })
+}
 
 export default function createApp() {
-  const app = new Hono()
+  const app = createRouter()
   app.use(serveEmojiFavicon('🔥'))
+
   app.use(pinoLogger())
   app.use(prettyJSON())
   app.notFound(notFound)
+  app.use(cors())
 
   // Documentation: https://hono.dev/examples/hono-openapi
   app.get(
@@ -20,10 +31,24 @@ export default function createApp() {
     openAPISpecs(app, {
       documentation: {
         info: {
-          title: 'Hono',
+          title: 'HRMS - API Documentation',
           version: '1.0.0',
-          description: 'API for greeting users',
+          description: 'API Documentation for each endpoint',
         },
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: 'http',
+              scheme: 'bearer',
+              bearerFormat: 'JWT',
+            },
+          },
+        },
+        security: [
+          {
+            bearerAuth: [],
+          },
+        ],
       },
     })
   )
@@ -33,6 +58,9 @@ export default function createApp() {
     '/docs',
     apiReference({
       theme: 'saturn',
+      _integration: 'nextjs',
+      layout: 'modern',
+      pageTitle: 'HRMS - API Reference',
       spec: {
         url: '/openapi',
       },

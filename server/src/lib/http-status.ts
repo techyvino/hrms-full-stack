@@ -122,17 +122,19 @@ function getDefaultMessageForCode(code: HttpStatusCode): string {
 function respondHandler(
   c: Context,
   type: keyof typeof statusMap,
-  customMessage?: string,
-  data?: unknown
+  response: unknown = ''
 ) {
   const statusResponse = statusMap[type]
+
+  const hasStringResponse = typeof response === 'string'
 
   return c.json(
     {
       status: statusResponse.statusCode,
       success: statusResponse.success,
-      message: customMessage || statusResponse.message,
-      data: data || null,
+      ...(hasStringResponse
+        ? { message: response || statusResponse.message }
+        : { data: response }),
     },
     statusResponse.statusCode
   )

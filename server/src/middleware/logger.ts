@@ -9,9 +9,10 @@ export function pinoLogger() {
   return logger({
     pino: pino(
       {
-        level: env.LOG_LEVEL || 'info',
+        level: 'error',
+        // level: env.LOG_LEVEL || 'silent',
       },
-      env.NODE_ENV === 'production' ? undefined : pretty()
+      env.ENV === 'production' ? undefined : pretty()
     ),
     http: {
       reqId: () => getRandomString(),

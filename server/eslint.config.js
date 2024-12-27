@@ -1,6 +1,5 @@
 import pluginJs from '@eslint/js'
 import baseConfig from '@hono/eslint-config'
-import tsParser from '@typescript-eslint/parser'
 import nodePlugin from 'eslint-plugin-n'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import promisePlugin from 'eslint-plugin-promise'
@@ -17,7 +16,6 @@ export default [
   { files: ['**/*.{js,mjs,cjs,ts}'] },
   {
     languageOptions: {
-      parser: tsParser,
       globals: globals.node,
       ecmaVersion: 'latest',
       parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
@@ -25,8 +23,8 @@ export default [
   },
   pluginJs.configs.recommended,
   eslintPluginUnicorn.configs['flat/recommended'],
-  ...tsEslint.configs.recommended,
   ...baseConfig,
+  ...tsEslint.configs.recommended,
   {
     rules: {
       'no-unused-vars': 'off',
@@ -34,6 +32,7 @@ export default [
       'import-x/order': 'off',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-use-before-define': 'warn',
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   }, // tslint-recommended
   {
@@ -122,7 +121,7 @@ export default [
     rules: {
       'unicorn/better-regex': 'warn',
       'unicorn/no-null': 'off',
-      'unicorn/prevent-abbreviations': 'warn',
+      'unicorn/prevent-abbreviations': 'off',
       'unicorn/filename-case': [
         'error',
         {

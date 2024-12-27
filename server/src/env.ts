@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/prevent-abbreviations */
-
 import { config } from 'dotenv'
 import { expand } from 'dotenv-expand'
 import { z } from 'zod'
@@ -7,9 +5,7 @@ import { z } from 'zod'
 expand(config())
 
 const EnvironmentSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'testing', 'production'])
-    .default('development'),
+  ENV: z.enum(['development', 'testing', 'production']).default('development'),
   PORT: z.coerce.number().default(8080),
   LOG_LEVEL: z
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
