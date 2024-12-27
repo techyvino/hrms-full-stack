@@ -37,8 +37,8 @@ export default function LoginForm() {
       if (res?.data?.access_token) {
         setCookie(
           'access_token',
-          res?.data?.access_token,
-          process.env.NODE_ENV !== 'production' ? {} : { httpOnly: true, secure: true, sameSite: 'strict' }
+          res?.data?.access_token
+          // process.env.NODE_ENV !== 'production' ? {} : { httpOnly: true, secure: true, sameSite: 'strict' }
         )
 
         return push('/dashboard')
