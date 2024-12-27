@@ -8,7 +8,7 @@ import axios from 'axios'
 import { deleteCookie, getCookie } from 'cookies-next/client'
 
 const api = axios.create({
-  baseURL: process.env?.NEXT_PUBLIC_ENDPOINT || 'https://arvi-hrms-backend.vercel.app/api',
+  baseURL: process?.env?.NEXT_PUBLIC_API_URL,
 })
 
 // Request interceptor to add token on header
@@ -30,6 +30,7 @@ api.interceptors.response.use(
       deleteCookie('access_token')
       window.location.href = '/login'
     }
+
     return Promise.reject(error)
   }
 )
