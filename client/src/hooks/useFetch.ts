@@ -48,13 +48,13 @@ export function useFetch<T>(options: UseFetchOptions<T> = {}): UseFetchResult<T>
       abortControllerRef.current = abortController
 
       // Pass the signal to axios
-      const { data } = await api.request<ApiResponse<T>>({
+      const response = await api.request<ApiResponse<T>>({
         ...axiosConfig,
         signal: abortController.signal,
       })
 
-      setResponse(data?.data)
-      onSuccess?.(data)
+      setResponse(response?.data?.data)
+      onSuccess?.(response?.data)
     } catch (err) {
       if (err instanceof AxiosError && axios.isCancel(err)) {
         // Ignore request cancellation

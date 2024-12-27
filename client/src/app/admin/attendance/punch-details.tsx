@@ -1,5 +1,5 @@
 'use client'
-import { Card, CardBody, CardHeader, useDisclosure } from '@nextui-org/react'
+import { Card, CardBody, CardHeader, Skeleton, useDisclosure } from '@nextui-org/react'
 import { Clock10, MoreVertical } from 'lucide-react'
 import React from 'react'
 import { Drawer } from 'vaul'
@@ -120,42 +120,48 @@ const PunchInfo = ({ selectedDate, selectedPunchInfo }: PunchInfoProps) => {
               <Drawer.Portal>
                 <Drawer.Overlay className="fixed inset-0 z-40 bg-black/10 dark:bg-gray-600/10" />
                 <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 mt-24 flex h-fit flex-col rounded-t-[10px] bg-gray-100 outline-none">
-                  <div className="flex-1 rounded-t-md bg-background p-4">
-                    <Drawer.Handle className="mb-4" />
-                    <Drawer.Title />
-                    <Drawer.Description />
-                    <div className="">
-                      {data?.clock_in && (
-                        <h3 className="text-xl">
-                          <span className="font-semibold">Date:</span>{' '}
-                          <span>{data?.clock_in ? formatDate(data?.clock_in) : null}</span>
-                        </h3>
-                      )}
-                      {/* Location Info */}
-                      <div className="grid w-full grid-cols-2 gap-2">
-                        <InfoCard
-                          fields={locationFields(data?.clock_in_location)}
-                          time={data?.clock_in}
-                          title="Clock in at: "
-                        />
-                        <InfoCard
-                          fields={locationFields(data?.clock_out_location)}
-                          time={data?.clock_in}
-                          title="Clock out at: "
-                        />
-                      </div>
+                  {isLoading ? (
+                    <div className="min-h-80">
+                      <Skeleton className="size-full" />
+                    </div>
+                  ) : (
+                    <div className="flex-1 rounded-t-md bg-background p-4">
+                      <Drawer.Handle className="mb-4" />
+                      <Drawer.Title />
+                      <Drawer.Description />
+                      <div className="">
+                        {data?.clock_in && (
+                          <h3 className="text-xl">
+                            <span className="font-semibold">Date:</span>{' '}
+                            <span>{data?.clock_in ? formatDate(data?.clock_in) : null}</span>
+                          </h3>
+                        )}
+                        {/* Location Info */}
+                        <div className="grid w-full grid-cols-2 gap-2">
+                          <InfoCard
+                            fields={locationFields(data?.clock_in_location)}
+                            time={data?.clock_in}
+                            title="Clock in at: "
+                          />
+                          <InfoCard
+                            fields={locationFields(data?.clock_out_location)}
+                            time={data?.clock_in}
+                            title="Clock out at: "
+                          />
+                        </div>
 
-                      {/* Device Info */}
-                      <div className={cn('flex gap-2')}>
-                        {data?.clock_in_device && isDiffDevice && (
-                          <InfoCard fields={deviceInfoFields(data?.clock_in_device)} title="Device Info" />
-                        )}
-                        {data?.clock_out_device && (
-                          <InfoCard fields={deviceInfoFields(data?.clock_out_device)} title="Device Info" />
-                        )}
+                        {/* Device Info */}
+                        <div className={cn('flex gap-2')}>
+                          {data?.clock_in_device && isDiffDevice && (
+                            <InfoCard fields={deviceInfoFields(data?.clock_in_device)} title="Device Info" />
+                          )}
+                          {data?.clock_out_device && (
+                            <InfoCard fields={deviceInfoFields(data?.clock_out_device)} title="Device Info" />
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </Drawer.Content>
               </Drawer.Portal>
             </Drawer.Root>

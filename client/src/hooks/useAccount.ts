@@ -17,6 +17,7 @@ export const useAccount = () => {
   useEffect(() => {
     if (token) {
       const { id, email, name, role_id } = jwtDecode(token) as Omit<JWTPayload, 'user_id'> & { id: number }
+
       if (id) {
         setAccount({ user_id: id, email, name, role_id })
       }
