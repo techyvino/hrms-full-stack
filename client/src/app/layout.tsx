@@ -38,10 +38,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         className={clsx('min-h-screen bg-background font-sans antialiased', fontSans.variable)}
       >
         <NoSSRWrapper>
-          <Providers themeProps={{ attribute: 'class', defaultTheme: 'dark' }}>
+          <Providers themeProps={{ attribute: 'class', defaultTheme: 'light' }}>
             <Navbar />
             <AuthWrapper>{children}</AuthWrapper>
             <Toaster
+              position="bottom-center"
               toastOptions={{
                 style: {
                   borderRadius: '99px',
