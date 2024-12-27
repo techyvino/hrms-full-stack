@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.hrms.app',
-  appName: 'arvi-hrms-client',
+  appName: 'Arvi HRMS',
   webDir: 'out',
   server: {
     url: 'https://hrms-full-stack.vercel.app/',
