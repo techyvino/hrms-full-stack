@@ -7,8 +7,10 @@ export interface ApiError {
 import axios from 'axios'
 import { deleteCookie, getCookie } from 'cookies-next/client'
 
+const baseURL = process.env?.NEXT_PUBLIC_API_URL
+
 const api = axios.create({
-  baseURL: process?.env?.NEXT_PUBLIC_API_URL,
+  baseURL,
 })
 
 // Request interceptor to add token on header
