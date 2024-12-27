@@ -10,11 +10,6 @@ certificates
 # production
 out
 
-
-# env
-.env
-.env.production
-
 # logs
 logs/
 *.log
